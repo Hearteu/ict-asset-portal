@@ -859,114 +859,234 @@ textarea.form-control {
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Printable Job Sheet Styling */
+/* ==========================================================================
+   Official DPWH Job Sheet Form Print Styles
+   ========================================================================== */
 #printableJobSheetModal .modal-body {
   background: #ffffff;
-  color: #1e293b;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  padding: 36px;
+  color: #000000;
+  font-family: Arial, Helvetica, sans-serif;
+  padding: 24px;
 }
 
-.printable-sheet {
-  max-width: 800px;
+.dpwh-sheet {
+  max-width: 820px;
   margin: 0 auto;
-  border: 2px solid #0f172a;
-  padding: 28px;
-  background: #fff;
+  border: 2px solid #000000;
+  background: #ffffff;
+  color: #000000;
+  font-size: 11px;
 }
 
-.print-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 2px solid #0f172a;
-  padding-bottom: 16px;
-  margin-bottom: 20px;
-}
-
-.print-header-left h2 {
-  font-size: 1.4rem;
-  color: #0f172a;
-  margin-bottom: 4px;
-}
-
-.print-header-left p {
-  font-size: 0.82rem;
-  color: #64748b;
-}
-
-.print-job-badge {
-  text-align: right;
-}
-
-.print-job-no {
-  font-size: 1.3rem;
-  font-weight: 800;
-  font-family: monospace;
-  color: #0369a1;
-}
-
-.print-section-title {
-  font-size: 0.82rem;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  font-weight: 700;
-  background: #f1f5f9;
-  padding: 6px 10px;
-  border-left: 4px solid #0284c7;
-  margin: 16px 0 8px 0;
-  color: #0f172a;
-}
-
-.print-grid {
+.dpwh-top-header {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 8px 16px;
-  font-size: 0.84rem;
-  margin-bottom: 12px;
+  grid-template-columns: 100px 1fr 220px;
+  border-bottom: 2px solid #000000;
+  align-items: center;
 }
 
-.print-grid-item {
-  border-bottom: 1px dotted #cbd5e1;
-  padding-bottom: 4px;
+.dpwh-logo-col {
+  padding: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-right: 1px solid #000000;
 }
 
-.print-label {
-  font-size: 0.72rem;
-  color: #64748b;
-  text-transform: uppercase;
+.dpwh-logo-circle {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background: #002d72;
+  color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 900;
+  font-size: 11px;
+  border: 3px solid #ff6600;
+  text-align: center;
+  line-height: 1.1;
 }
 
-.print-val {
-  font-weight: 600;
-  color: #0f172a;
+.dpwh-title-col {
+  padding: 8px 14px;
+  border-right: 1px solid #000000;
 }
 
-.print-text-box {
-  border: 1px solid #cbd5e1;
+.dpwh-rep {
+  font-size: 10px;
+  color: #222;
+}
+
+.dpwh-dept {
+  font-size: 11px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+}
+
+.dpwh-reg {
+  font-size: 10.5px;
+  font-weight: bold;
+}
+
+.dpwh-office {
+  font-size: 11px;
+  font-weight: bold;
+  color: #002d72;
+}
+
+.dpwh-address {
+  font-size: 9px;
+  color: #444;
+}
+
+.dpwh-ref-col {
   padding: 10px 12px;
-  font-size: 0.84rem;
-  line-height: 1.5;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.dpwh-form-title {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 0.05em;
+  margin-bottom: 6px;
+}
+
+.dpwh-ref-box {
+  font-size: 10.5px;
+  border: 1px solid #000;
+  padding: 4px 6px;
   background: #f8fafc;
-  min-height: 48px;
-  margin-bottom: 12px;
+  font-weight: bold;
+}
+
+.dpwh-ref-box span {
+  font-family: monospace;
+  font-size: 12px;
+  color: #002d72;
+}
+
+.dpwh-section-header {
+  background: #000000;
+  color: #ffffff;
+  font-weight: bold;
+  font-size: 11px;
+  text-align: center;
+  padding: 4px 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dpwh-form-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dpwh-form-table td {
+  border: 1px solid #000000;
+  padding: 4px 8px;
+  font-size: 10.5px;
+  vertical-align: middle;
+}
+
+.dpwh-label {
+  font-weight: bold;
+  color: #111;
+  width: 120px;
+}
+
+.dpwh-val {
+  background: #f0f4f8;
+  padding: 3px 6px;
+  border-radius: 2px;
+  color: #000;
+  font-weight: 500;
+}
+
+.dpwh-sub-header {
+  background: #e2e8f0;
+  font-weight: bold;
+  font-size: 10.5px;
+  padding: 3px 8px;
+  border: 1px solid #000000;
+}
+
+.dpwh-lines-box {
+  min-height: 55px;
+  padding: 6px 8px;
+  line-height: 1.4;
+  border: 1px solid #000000;
+  background: #ffffff;
   white-space: pre-line;
 }
 
-.print-signatures {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 40px;
-  margin-top: 36px;
-  padding-top: 20px;
+.dpwh-sig-row {
+  display: flex;
+  justify-content: flex-end;
+  padding: 14px 16px 4px 16px;
+  border: 1px solid #000000;
+  border-top: none;
 }
 
-.sig-box {
-  border-top: 1px solid #0f172a;
+.dpwh-sig-block {
+  width: 250px;
   text-align: center;
-  padding-top: 8px;
-  font-size: 0.82rem;
-  color: #475569;
+  border-top: 1px solid #000000;
+  padding-top: 4px;
+  font-size: 9.5px;
+}
+
+.dpwh-eval-grid {
+  padding: 8px 12px;
+  border: 1px solid #000000;
+  border-top: none;
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.dpwh-eval-q {
+  margin-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.dpwh-checkbox-group {
+  display: flex;
+  gap: 14px;
+}
+
+.dpwh-checkbox {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.dpwh-checkbox-box {
+  display: inline-block;
+  width: 11px;
+  height: 11px;
+  border: 1px solid #000000;
+  text-align: center;
+  line-height: 10px;
+  font-size: 9px;
+  font-weight: bold;
+}
+
+.dpwh-footer {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border: 1px solid #000000;
+  border-top: none;
+  padding: 4px 10px;
+  font-size: 9px;
+  font-style: italic;
+  background: #f8fafc;
 }
 
 @media print {
@@ -983,14 +1103,18 @@ textarea.form-control {
     width: 100%;
     margin: 0;
     padding: 0;
-    background: #fff;
+    background: #ffffff !important;
   }
   .modal-header, .modal-footer {
     display: none !important;
   }
   .modal-box {
-    border: none;
-    box-shadow: none;
-    max-width: 100%;
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+  }
+  .dpwh-sheet {
+    border: 2px solid #000 !important;
+    page-break-inside: avoid;
   }
 }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ICT Asset & Job Sheet Portal</title>
+  <title>DPWH ODE-ICTS Computer Inventory & Job Sheet Portal</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -14,39 +14,39 @@
   <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand-section">
-      <div class="brand-icon">⚡</div>
+      <div class="brand-icon">🏛️</div>
       <div class="brand-info">
-        <h1>ICT Operations</h1>
-        <span>Asset & Repair Portal</span>
+        <h1>DPWH ODE-ICTS</h1>
+        <span>Inventory & Job Sheet Portal</span>
       </div>
     </div>
 
     <ul class="nav-links">
       <li class="nav-item active" data-view="dashboard">
         <button id="navDashboardBtn">
-          <span class="nav-icon">📊</span> Dashboard Overview
+          <span class="nav-icon">📊</span> Operations Dashboard
         </button>
       </li>
       <li class="nav-item" data-view="inventory">
         <button id="navInventoryBtn">
-          <span class="nav-icon">💻</span> Computer Inventory
+          <span class="nav-icon">💻</span> Computer Inventory Sheet
         </button>
       </li>
       <li class="nav-item" data-view="jobs">
         <button id="navJobsBtn">
-          <span class="nav-icon">🛠️</span> Job Sheets & Repairs
+          <span class="nav-icon">🛠️</span> Job Sheets & Maintenance
         </button>
       </li>
       <li class="nav-item" data-view="history">
         <button id="navHistoryBtn">
-          <span class="nav-icon">📜</span> Repair Audit History
+          <span class="nav-icon">📜</span> Repair Audit Trail
         </button>
       </li>
     </ul>
 
     <div class="sidebar-footer">
-      <div class="badge-pill">● System Online (Local SQLite)</div>
-      <div style="margin-top: 6px;">Internal ICT Staff Portal v1.0</div>
+      <div class="badge-pill">● System Online (Django + SQLite)</div>
+      <div style="margin-top: 6px;">Davao de Oro 1st DEO &bull; ICTS</div>
     </div>
   </aside>
 
@@ -56,18 +56,18 @@
     <header class="topbar">
       <div class="global-search-container">
         <span class="search-icon">🔍</span>
-        <input type="text" id="globalSearch" placeholder="Quick find by Serial No, Asset Tag, Owner, or Job #...">
+        <input type="text" id="globalSearch" placeholder="Search End-User, Serial No, Computer Name, or Job Ref #...">
       </div>
 
       <div class="topbar-actions">
-        <a href="/api/assets/export/csv" class="btn btn-secondary" title="Export all inventory to CSV">
-          📥 Export CSV
+        <a href="/api/assets/export/csv/" class="btn btn-secondary" title="Export Inventory Sheet to Excel/CSV">
+          📥 Export Inventory (CSV)
         </a>
         <button class="btn btn-secondary" onclick="openNewAssetModal()" id="btnTopNewAsset">
-          ➕ New Computer
+          ➕ Register Computer
         </button>
         <button class="btn btn-primary" onclick="openNewJobSheetModal()" id="btnTopNewJob">
-          🛠️ New Job Sheet
+          🛠️ New Job Sheet Form
         </button>
       </div>
     </header>
@@ -79,8 +79,8 @@
       <section id="dashboardView" class="portal-view active">
         <div class="view-header">
           <div>
-            <h2>ICT Operations Dashboard</h2>
-            <p>Summary of organization computer hardware assets, active repair tickets, and spare pool.</p>
+            <h2>ICT Operations & Inventory Dashboard</h2>
+            <p>Davao de Oro 1st District Engineering Office &bull; ICT Support Section</p>
           </div>
         </div>
 
@@ -143,24 +143,24 @@
           <!-- Quick Action Portal Panel -->
           <div class="card-panel">
             <div class="panel-header">
-              <h3><span>⚡</span> Quick Management Portal</h3>
+              <h3><span>⚡</span> Quick Management Actions</h3>
             </div>
             <div class="panel-body" style="display: flex; flex-direction: column; gap: 12px;">
               <p style="font-size: 0.85rem; color: var(--text-secondary);">
-                Select an action below to manage ICT assets or process maintenance tickets.
+                Manage computer inventory, generate official DPWH job sheets, and inspect repair logs.
               </p>
               <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 6px;">
                 <button class="btn btn-secondary" style="justify-content: center; padding: 14px;" onclick="openNewAssetModal()">
-                  💻 Register Computer
+                  💻 Add to Inventory
                 </button>
                 <button class="btn btn-primary" style="justify-content: center; padding: 14px;" onclick="openNewJobSheetModal()">
-                  🛠️ Create Job Sheet
+                  🛠️ File Job Sheet
                 </button>
                 <button class="btn btn-secondary" style="justify-content: center; padding: 14px;" onclick="switchView('inventory')">
-                  🔍 Browse Inventory
+                  🔍 Browse Inventory Sheet
                 </button>
                 <button class="btn btn-secondary" style="justify-content: center; padding: 14px;" onclick="switchView('history')">
-                  📜 Repair Audit Log
+                  📜 Repair History Trail
                 </button>
               </div>
             </div>
@@ -168,22 +168,22 @@
         </div>
       </section>
 
-      <!-- 2. COMPUTER INVENTORY VIEW -->
+      <!-- 2. COMPUTER INVENTORY VIEW (ALIGNED TO EXCEL SPREADSHEET) -->
       <section id="inventoryView" class="portal-view">
         <div class="view-header">
           <div>
-            <h2>Computer & Hardware Inventory</h2>
-            <p>Track machines, serial numbers, hardware specifications, parts, assigned owners, and service records.</p>
+            <h2>Computer Hardware Inventory Sheet</h2>
+            <p>Aligned with the ODE-ICTS standard inventory registry (End-Users, Peripherals, Serial Numbers & Offices).</p>
           </div>
           <button class="btn btn-primary" onclick="openNewAssetModal()">
-            ➕ Register Computer
+            ➕ Add Computer
           </button>
         </div>
 
         <!-- Inventory Filters -->
         <div class="toolbar">
           <div class="toolbar-group">
-            <input type="text" id="assetSearchInput" class="form-control" style="width: 260px;" placeholder="Search Tag, Serial, Model, Owner...">
+            <input type="text" id="assetSearchInput" class="form-control" style="width: 280px;" placeholder="Search End-User, Serial, Brand, Computer Name...">
             
             <select id="assetStatusFilter" class="filter-select">
               <option value="">All Statuses</option>
@@ -194,30 +194,31 @@
             </select>
 
             <select id="assetTypeFilter" class="filter-select">
-              <option value="">All Device Types</option>
-              <option value="Laptop">Laptop</option>
+              <option value="">All Devices</option>
               <option value="Desktop">Desktop</option>
+              <option value="Laptop">Laptop</option>
+              <option value="All-in-One">All-in-One</option>
               <option value="Workstation">Workstation</option>
               <option value="Server">Server</option>
-              <option value="All-in-One">All-in-One</option>
-              <option value="Other">Other</option>
             </select>
           </div>
         </div>
 
-        <!-- Assets Table -->
+        <!-- Assets Table matching Excel Columns -->
         <div class="table-responsive">
           <table class="data-table">
             <thead>
               <tr>
-                <th>Asset Tag</th>
-                <th>Serial No.</th>
-                <th>Device & Specifications</th>
-                <th>Assigned Owner / Dept</th>
-                <th>Location</th>
-                <th>Status</th>
-                <th>Repairs</th>
-                <th>Actions</th>
+                <th>END-USER</th>
+                <th>DEVICE</th>
+                <th>BRAND and MODEL</th>
+                <th>SERIAL NUMBER</th>
+                <th>COMPUTER NAME</th>
+                <th>MONITOR with S/N</th>
+                <th>UPS with S/N</th>
+                <th>OFFICE</th>
+                <th>REPAIR HISTORY</th>
+                <th>ACTIONS</th>
               </tr>
             </thead>
             <tbody id="assetTableBody">
@@ -231,21 +232,21 @@
       <section id="jobsView" class="portal-view">
         <div class="view-header">
           <div>
-            <h2>Job Sheets & Repair Management</h2>
-            <p>Maintenance requests, diagnosis, technician actions, parts replacements, and sign-offs.</p>
+            <h2>Official Job Sheet Service Requests</h2>
+            <p>Client requests, technical assessments, actions taken, and official DPWH sign-off forms.</p>
           </div>
           <button class="btn btn-primary" onclick="openNewJobSheetModal()">
-            🛠️ New Job Sheet
+            🛠️ New Job Sheet Form
           </button>
         </div>
 
         <!-- Job Filters -->
         <div class="toolbar">
           <div class="toolbar-group">
-            <input type="text" id="jobSearchInput" class="form-control" style="width: 260px;" placeholder="Search Job #, Serial, Issue, Tech...">
+            <input type="text" id="jobSearchInput" class="form-control" style="width: 280px;" placeholder="Search Ref #, End-User, Serial, Technician...">
             
             <select id="jobStatusFilter" class="filter-select">
-              <option value="">All Job Statuses</option>
+              <option value="">All Statuses</option>
               <option value="Open">Open</option>
               <option value="In Progress">In Progress</option>
               <option value="Waiting for Parts">Waiting for Parts</option>
@@ -268,13 +269,14 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Job #</th>
-                <th>Target Asset / Serial</th>
-                <th>Reported Issue & Parts</th>
-                <th>Priority</th>
+                <th>Ref. No.</th>
+                <th>Client (End-User)</th>
+                <th>Office / Section</th>
+                <th>Device & Serial</th>
+                <th>Incident / Service Request</th>
                 <th>Status</th>
-                <th>Assigned Tech</th>
-                <th>Cost</th>
+                <th>Fulfilled By</th>
+                <th>Date Filed</th>
                 <th>Actions</th>
               </tr>
             </thead>
@@ -289,14 +291,14 @@
       <section id="historyView" class="portal-view">
         <div class="view-header">
           <div>
-            <h2>Complete Repair Audit History</h2>
-            <p>Chronological breakdown of all maintenance, diagnostics, and component replacements across the fleet.</p>
+            <h2>Complete Hardware Repair History</h2>
+            <p>Chronological breakdown of all technical maintenance and component repairs across ODE-ICTS assets.</p>
           </div>
         </div>
 
         <div class="toolbar">
           <div class="toolbar-group">
-            <input type="text" id="historySearchInput" class="form-control" style="width: 320px;" placeholder="Filter audit trail by Serial, Asset Tag, or Issue...">
+            <input type="text" id="historySearchInput" class="form-control" style="width: 320px;" placeholder="Filter audit trail by Serial, End-User, or Incident...">
           </div>
         </div>
 
@@ -308,7 +310,7 @@
     </main>
   </div>
 
-  <!-- MODAL: Asset Details & Repair History -->
+  <!-- MODAL: Computer Profile & Repair History -->
   <div id="assetDetailModal" class="modal-overlay">
     <div class="modal-box modal-lg">
       <div class="modal-header">
@@ -319,31 +321,24 @@
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
           <div>
             <span id="detailStatus"></span>
-            <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 10px;">Type: <strong id="detailType" style="color: #fff;"></strong></span>
+            <span style="font-size: 0.85rem; color: var(--text-muted); margin-left: 10px;">Device: <strong id="detailType" style="color: #fff;"></strong></span>
           </div>
           <div>
-            <button class="btn btn-primary btn-sm" id="btnCreateJobForAsset">🛠️ Create Job Sheet for this PC</button>
+            <button class="btn btn-primary btn-sm" id="btnCreateJobForAsset">🛠️ File Job Sheet for this Computer</button>
           </div>
         </div>
 
-        <h4 style="font-size: 0.82rem; text-transform: uppercase; color: #38bdf8; margin-bottom: 10px;">Hardware Specifications & Parts</h4>
+        <h4 style="font-size: 0.82rem; text-transform: uppercase; color: #38bdf8; margin-bottom: 10px;">Inventory Registry Data</h4>
         <div class="auto-spec-card" style="margin-bottom: 20px;">
-          <div class="spec-item"><span>Asset Tag</span><span id="detailTag"></span></div>
-          <div class="spec-item"><span>Serial Number</span><span id="detailSerial"></span></div>
+          <div class="spec-item"><span>End-User</span><span id="detailOwner"></span></div>
           <div class="spec-item"><span>Brand & Model</span><span id="detailModel"></span></div>
-          <div class="spec-item"><span>Processor (CPU)</span><span id="detailCpu"></span></div>
-          <div class="spec-item"><span>Memory (RAM)</span><span id="detailRam"></span></div>
-          <div class="spec-item"><span>Storage / SSD</span><span id="detailStorage"></span></div>
-          <div class="spec-item"><span>Graphics (GPU)</span><span id="detailGpu"></span></div>
-          <div class="spec-item"><span>Operating System</span><span id="detailOs"></span></div>
-          <div class="spec-item"><span>Warranty Expiry</span><span id="detailWarranty"></span></div>
-        </div>
-
-        <h4 style="font-size: 0.82rem; text-transform: uppercase; color: #38bdf8; margin-bottom: 10px;">Assignment & Location</h4>
-        <div class="auto-spec-card" style="margin-bottom: 20px;">
-          <div class="spec-item"><span>Assigned Owner</span><span id="detailOwner"></span></div>
-          <div class="spec-item"><span>Department</span><span id="detailDept"></span></div>
-          <div class="spec-item"><span>Office / Desk Location</span><span id="detailLocation"></span></div>
+          <div class="spec-item"><span>Serial Number</span><span id="detailSerial"></span></div>
+          <div class="spec-item"><span>Computer Name</span><span id="detailCompName"></span></div>
+          <div class="spec-item"><span>Monitor with S/N</span><span id="detailMonitor"></span></div>
+          <div class="spec-item"><span>UPS with S/N</span><span id="detailUps"></span></div>
+          <div class="spec-item"><span>Office / Division</span><span id="detailDept"></span></div>
+          <div class="spec-item"><span>Processor</span><span id="detailCpu"></span></div>
+          <div class="spec-item"><span>Memory & Storage</span><span id="detailRamStorage"></span></div>
         </div>
 
         <div style="margin-bottom: 20px;">
@@ -355,7 +350,7 @@
           <span>📜</span> Machine Repair History Log
         </h4>
         <div class="history-timeline" id="assetRepairHistoryContainer">
-          <!-- Dynamically filled with repair cards for this computer -->
+          <!-- Dynamically filled with repair cards -->
         </div>
       </div>
       <div class="modal-footer">
@@ -368,61 +363,57 @@
   <div id="assetModal" class="modal-overlay">
     <div class="modal-box modal-lg">
       <div class="modal-header">
-        <h3 id="assetModalTitle">Register New Computer</h3>
+        <h3 id="assetModalTitle">Register Computer to Inventory</h3>
         <button class="modal-close-btn">&times;</button>
       </div>
       <form id="assetForm">
         <div class="modal-body">
           <div class="form-grid">
             <div class="form-group">
-              <label class="form-label">Asset Tag *</label>
-              <input type="text" id="assetTagInput" class="form-control" placeholder="e.g. ICT-NB-004" required>
+              <label class="form-label">End-User *</label>
+              <input type="text" id="assetOwnerInput" class="form-control" placeholder="e.g. Stephen C. Maybanting" required>
             </div>
-            <div class="form-group">
-              <label class="form-label">Serial Number *</label>
-              <input type="text" id="assetSerialInput" class="form-control" placeholder="e.g. 5CD9481XYZ" required>
-            </div>
-
             <div class="form-group">
               <label class="form-label">Device Type</label>
               <select id="assetTypeSelect" class="form-control">
-                <option value="Laptop">Laptop</option>
                 <option value="Desktop">Desktop</option>
+                <option value="Laptop">Laptop</option>
+                <option value="All-in-One">All-in-One</option>
                 <option value="Workstation">Workstation</option>
                 <option value="Server">Server</option>
-                <option value="All-in-One">All-in-One</option>
                 <option value="Other">Other</option>
               </select>
             </div>
+
             <div class="form-group">
-              <label class="form-label">Brand & Model *</label>
-              <input type="text" id="assetModelInput" class="form-control" placeholder="e.g. Dell Latitude 5420" required>
+              <label class="form-label">Brand and Model *</label>
+              <input type="text" id="assetModelInput" class="form-control" placeholder="e.g. HP EliteDesk 800 G3" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Serial Number *</label>
+              <input type="text" id="assetSerialInput" class="form-control" placeholder="e.g. SGH745RH01" required>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Processor (CPU)</label>
-              <input type="text" id="assetCpuInput" class="form-control" placeholder="e.g. Intel Core i7-1185G7 @ 3.00GHz">
+              <label class="form-label">Computer Name</label>
+              <input type="text" id="assetComputerNameInput" class="form-control" placeholder="e.g. ODE-ICTS-DT04">
             </div>
             <div class="form-group">
-              <label class="form-label">Memory (RAM)</label>
-              <input type="text" id="assetRamInput" class="form-control" placeholder="e.g. 16 GB DDR4">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label">Storage / SSD</label>
-              <input type="text" id="assetStorageInput" class="form-control" placeholder="e.g. 512 GB NVMe SSD">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Graphics Card (GPU)</label>
-              <input type="text" id="assetGpuInput" class="form-control" placeholder="e.g. Intel Iris Xe / NVIDIA RTX 3060">
+              <label class="form-label">Office / Section / Division</label>
+              <input type="text" id="assetDeptInput" class="form-control" value="ODE-ICTS" placeholder="e.g. ODE-ICTS">
             </div>
 
             <div class="form-group">
-              <label class="form-label">Operating System</label>
-              <input type="text" id="assetOsInput" class="form-control" placeholder="e.g. Windows 11 Pro 64-bit">
+              <label class="form-label">Monitor with Serial Number</label>
+              <input type="text" id="assetMonitorInput" class="form-control" placeholder="e.g. HP EliteDisplay E233 (3CQ8141ABC)">
             </div>
             <div class="form-group">
-              <label class="form-label">Device Status</label>
+              <label class="form-label">UPS with Serial Number</label>
+              <input type="text" id="assetUpsInput" class="form-control" placeholder="e.g. APC Back-UPS 650VA (BB190401)">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Status</label>
               <select id="assetStatusSelect" class="form-control">
                 <option value="In Use">In Use</option>
                 <option value="Available / Spare">Available / Spare</option>
@@ -430,49 +421,39 @@
                 <option value="Decommissioned">Decommissioned</option>
               </select>
             </div>
-
             <div class="form-group">
-              <label class="form-label">Assigned Owner Name</label>
-              <input type="text" id="assetOwnerInput" class="form-control" placeholder="e.g. Jane Doe (or Unassigned)">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Department</label>
-              <input type="text" id="assetDeptInput" class="form-control" placeholder="e.g. Finance, Marketing, IT">
-            </div>
-
-            <div class="form-group col-span-2">
-              <label class="form-label">Physical Office / Desk Location</label>
-              <input type="text" id="assetLocationInput" class="form-control" placeholder="e.g. HQ Tower A, Level 3, Desk 304">
+              <label class="form-label">Processor (CPU)</label>
+              <input type="text" id="assetCpuInput" class="form-control" placeholder="e.g. Intel Core i7-7700 @ 3.60GHz">
             </div>
 
             <div class="form-group">
-              <label class="form-label">Purchase Date</label>
-              <input type="date" id="assetPurchaseDate" class="form-control">
+              <label class="form-label">Memory (RAM)</label>
+              <input type="text" id="assetRamInput" class="form-control" placeholder="e.g. 16 GB DDR4">
             </div>
             <div class="form-group">
-              <label class="form-label">Warranty Expiration Date</label>
-              <input type="date" id="assetWarrantyDate" class="form-control">
+              <label class="form-label">Storage / SSD</label>
+              <input type="text" id="assetStorageInput" class="form-control" placeholder="e.g. 256 GB SSD + 1 TB HDD">
             </div>
 
             <div class="form-group col-span-2">
-              <label class="form-label">ICT Notes & Asset History</label>
-              <textarea id="assetNotesInput" class="form-control" placeholder="Optional notes, accessories issued, docking stations..."></textarea>
+              <label class="form-label">Remarks / Notes</label>
+              <textarea id="assetNotesInput" class="form-control" placeholder="Additional specifications, accessories, or condition notes..."></textarea>
             </div>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save Computer</button>
+          <button type="submit" class="btn btn-primary">Save to Inventory</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- MODAL: Add / Edit Job Sheet Form -->
+  <!-- MODAL: Add / Edit Official DPWH Job Sheet -->
   <div id="jobSheetModal" class="modal-overlay">
     <div class="modal-box modal-lg">
       <div class="modal-header">
-        <h3 id="jobSheetModalTitle">Maintenance & Repair Job Sheet</h3>
+        <h3 id="jobSheetModalTitle">Official DPWH Job Sheet Form</h3>
         <button class="modal-close-btn">&times;</button>
       </div>
       <form id="jobSheetForm">
@@ -480,29 +461,89 @@
           <div class="form-grid">
             
             <div class="form-group col-span-2">
-              <label class="form-label">Select Computer to Service *</label>
+              <label class="form-label">Select Computer to Service (From Inventory) *</label>
               <select id="jobAssetSelect" class="form-control" required>
-                <!-- Dynamically populated with computers -->
+                <!-- Populated dynamically -->
               </select>
             </div>
 
             <!-- Auto-populated Spec Card Preview -->
             <div id="jobAssetPreviewCard" class="auto-spec-card col-span-2" style="display: none;">
-              <div class="spec-item"><span>Model:</span><span id="previewModel">-</span></div>
-              <div class="spec-item"><span>Serial:</span><span id="previewSerial">-</span></div>
-              <div class="spec-item"><span>Owner:</span><span id="previewOwner">-</span></div>
-              <div class="spec-item"><span>CPU:</span><span id="previewCpu">-</span></div>
-              <div class="spec-item"><span>RAM:</span><span id="previewRam">-</span></div>
-              <div class="spec-item"><span>Storage:</span><span id="previewStorage">-</span></div>
-              <div class="spec-item"><span>OS:</span><span id="previewOs">-</span></div>
-              <div class="spec-item"><span>Current Status:</span><span id="previewStatus">-</span></div>
+              <div class="spec-item"><span>End-User:</span><span id="previewOwner">-</span></div>
+              <div class="spec-item"><span>Brand/Model:</span><span id="previewModel">-</span></div>
+              <div class="spec-item"><span>Serial Number:</span><span id="previewSerial">-</span></div>
+              <div class="spec-item"><span>Computer Name:</span><span id="previewCompName">-</span></div>
+              <div class="spec-item"><span>Office:</span><span id="previewOffice">-</span></div>
+              <div class="spec-item"><span>Status:</span><span id="previewStatus">-</span></div>
+            </div>
+
+            <div class="form-group col-span-2" style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 4px;">
+              <strong style="color: #38bdf8; font-size: 0.82rem; text-transform: uppercase;">1. CLIENT'S INFORMATION and SERVICE REQUEST</strong>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Client Full Name *</label>
+              <input type="text" id="jobClientName" class="form-control" placeholder="e.g. Stephen C. Maybanting" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Section / Division</label>
+              <input type="text" id="jobSection" class="form-control" value="ODE-ICTS" placeholder="e.g. ODE-ICTS">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Date of Filing *</label>
+              <input type="date" id="jobDateFiling" class="form-control" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Contact No.</label>
+              <input type="text" id="jobContact" class="form-control" placeholder="e.g. Local 4102">
             </div>
 
             <div class="form-group col-span-2">
-              <label class="form-label">Reported Issue / Problem Description *</label>
-              <textarea id="jobIssueInput" class="form-control" placeholder="Describe the symptom (e.g. No display, sudden reboot, battery swollen, slow performance)..." required></textarea>
+              <label class="form-label">Brief description of the Incident or Request *</label>
+              <textarea id="jobIssueInput" class="form-control" placeholder="Details of the incident or request..." required></textarea>
             </div>
 
+            <div class="form-group col-span-2" style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 4px;">
+              <strong style="color: #38bdf8; font-size: 0.82rem; text-transform: uppercase;">2. I.T. SUPPORT TECHNICAL ASSESSMENT</strong>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Application System / Software Description</label>
+              <input type="text" id="jobAppSoftware" class="form-control" placeholder="e.g. DPWH DoTS / Windows 10 OS">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Software Version</label>
+              <input type="text" id="jobAppVersion" class="form-control" placeholder="e.g. v4.2.1">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Connectivity Description</label>
+              <input type="text" id="jobConnectivity" class="form-control" placeholder="e.g. Local LAN / Internet access">
+            </div>
+            <div class="form-group">
+              <label class="form-label">User Account Description</label>
+              <input type="text" id="jobUserAccount" class="form-control" placeholder="e.g. Standard domain account">
+            </div>
+
+            <div class="form-group col-span-2">
+              <label class="form-label">Technical Assessment Findings</label>
+              <textarea id="jobDiagnosisInput" class="form-control" placeholder="Assessment / diagnostic findings upon inspection..."></textarea>
+            </div>
+
+            <div class="form-group col-span-2">
+              <label class="form-label">Actions Taken and/or Recommendations</label>
+              <textarea id="jobActionInput" class="form-control" placeholder="Troubleshooting steps taken, hardware replaced, recommendations..."></textarea>
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Mode of Filing</label>
+              <select id="jobModeFiling" class="form-control">
+                <option value="Walk-in">Walk-in</option>
+                <option value="Telephone Call">Telephone Call</option>
+                <option value="Email">Email</option>
+              </select>
+            </div>
             <div class="form-group">
               <label class="form-label">Priority</label>
               <select id="jobPrioritySelect" class="form-control">
@@ -512,8 +553,27 @@
                 <option value="Critical">Critical</option>
               </select>
             </div>
+
             <div class="form-group">
-              <label class="form-label">Job Status</label>
+              <label class="form-label">Date and Time Received</label>
+              <input type="text" id="jobDateReceived" class="form-control" placeholder="e.g. 2026-09-18 08:30 AM">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Date and Time Completed</label>
+              <input type="text" id="jobDateCompleted" class="form-control" placeholder="e.g. 2026-09-18 11:45 AM">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Fulfilled by (Technician Signature/Name)</label>
+              <input type="text" id="jobTechInput" class="form-control" placeholder="e.g. Engr. J. Dela Cruz">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Reviewed by (Supervisor Signature/Name)</label>
+              <input type="text" id="jobReviewedBy" class="form-control" placeholder="e.g. Head, ICT Unit">
+            </div>
+
+            <div class="form-group">
+              <label class="form-label">Ticket Status</label>
               <select id="jobStatusSelect" class="form-control">
                 <option value="Open" selected>Open</option>
                 <option value="In Progress">In Progress</option>
@@ -523,43 +583,33 @@
               </select>
             </div>
 
-            <div class="form-group">
-              <label class="form-label">Assigned ICT Technician</label>
-              <input type="text" id="jobTechInput" class="form-control" placeholder="e.g. Alex Wong (ICT)">
-            </div>
-            <div class="form-group">
-              <label class="form-label">Repair / Parts Cost ($)</label>
-              <input type="number" step="0.01" id="jobCostInput" class="form-control" placeholder="0.00">
+            <div class="form-group col-span-2" style="border-top: 1px solid var(--border-color); padding-top: 10px; margin-top: 4px;">
+              <strong style="color: #38bdf8; font-size: 0.82rem; text-transform: uppercase;">3. CLIENT'S EVALUATION (POST-SERVICE FEEDBACK)</strong>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Date Received</label>
-              <input type="date" id="jobDateReceived" class="form-control">
+              <label class="form-label">Was concern properly addressed?</label>
+              <select id="jobEvalAddressed" class="form-control">
+                <option value="">- Select -</option>
+                <option value="Yes">Yes</option>
+                <option value="No">No</option>
+              </select>
             </div>
             <div class="form-group">
-              <label class="form-label">Date Completed / Closed</label>
-              <input type="date" id="jobDateCompleted" class="form-control">
+              <label class="form-label">IT Support Satisfaction</label>
+              <select id="jobEvalSupport" class="form-control">
+                <option value="">- Select -</option>
+                <option value="Very Satisfied">Very Satisfied</option>
+                <option value="Satisfied">Satisfied</option>
+                <option value="Not Satisfied">Not Satisfied</option>
+              </select>
             </div>
 
             <div class="form-group col-span-2">
-              <label class="form-label">Technician Diagnosis</label>
-              <textarea id="jobDiagnosisInput" class="form-control" placeholder="Findings upon hardware/software inspection..."></textarea>
+              <label class="form-label">Client Comments and/or Suggestions</label>
+              <input type="text" id="jobComments" class="form-control" placeholder="Feedback or comments from client...">
             </div>
 
-            <div class="form-group col-span-2">
-              <label class="form-label">Action Taken / Resolution Details</label>
-              <textarea id="jobActionInput" class="form-control" placeholder="Steps taken to troubleshoot and repair..."></textarea>
-            </div>
-
-            <div class="form-group col-span-2">
-              <label class="form-label">Parts Replaced / Added</label>
-              <input type="text" id="jobPartsInput" class="form-control" placeholder="e.g. 512GB Kingston NVMe SSD, OEM Laptop Battery, 16GB DDR4 RAM">
-            </div>
-
-            <div class="form-group col-span-2">
-              <label class="form-label">General Remarks / Warranty Return Notes</label>
-              <input type="text" id="jobRemarksInput" class="form-control" placeholder="e.g. Stress tested with Prime95 for 1 hour. Pass.">
-            </div>
           </div>
         </div>
         <div class="modal-footer">
@@ -570,70 +620,187 @@
     </div>
   </div>
 
-  <!-- MODAL: Printable Job Sheet Form -->
+  <!-- MODAL: Official DPWH Job Sheet Printable Form -->
   <div id="printableJobSheetModal" class="modal-overlay">
     <div class="modal-box modal-lg">
       <div class="modal-header">
-        <h3>🖨️ Printable ICT Job Sheet Form</h3>
+        <h3>🖨️ Official DPWH Job Sheet Form</h3>
         <button class="modal-close-btn">&times;</button>
       </div>
       <div class="modal-body">
         
-        <div class="printable-sheet">
-          <div class="print-header">
-            <div class="print-header-left">
-              <h2>ICT HARDWARE MAINTENANCE JOB SHEET</h2>
-              <p>INTERNAL TECHNICAL SERVICES & ASSET REPAIR ORDER</p>
+        <!-- Official DPWH Document Replica -->
+        <div class="dpwh-sheet">
+          <div class="dpwh-top-header">
+            <div class="dpwh-logo-col">
+              <div class="dpwh-logo-circle">
+                DPWH<br>RO XI
+              </div>
             </div>
-            <div class="print-job-badge">
-              <div class="print-job-no" id="printJobNo">JOB-2026-0000</div>
-              <div style="font-size: 0.75rem; color: #64748b;">Date: <strong id="printDate" style="color:#0f172a;">-</strong></div>
+            <div class="dpwh-title-col">
+              <div class="dpwh-rep">Republic of the Philippines</div>
+              <div class="dpwh-dept">DEPARTMENT OF PUBLIC WORKS AND HIGHWAYS</div>
+              <div class="dpwh-reg">REGIONAL OFFICE NO. XI</div>
+              <div class="dpwh-office">Davao de Oro 1st District Engineering Office</div>
+              <div class="dpwh-address">Purok-18, Humabon St., Poblacion, Nabunturan, Davao de Oro</div>
+            </div>
+            <div class="dpwh-ref-col">
+              <div class="dpwh-form-title">JOB SHEET FORM</div>
+              <div class="dpwh-ref-box">
+                Ref. No.: <span id="printJobNo">2026-09-001</span>
+              </div>
             </div>
           </div>
 
-          <div class="print-section-title">1. Computer & Hardware Asset Specifications</div>
-          <div class="print-grid">
-            <div class="print-grid-item"><div class="print-label">Asset Tag</div><div class="print-val" id="printAssetTag">-</div></div>
-            <div class="print-grid-item"><div class="print-label">Serial Number</div><div class="print-val" id="printSerial">-</div></div>
-            <div class="print-grid-item"><div class="print-label">Brand & Model</div><div class="print-val" id="printModel">-</div></div>
-            <div class="print-grid-item"><div class="print-label">Assigned Owner</div><div class="print-val" id="printOwner">-</div></div>
-            <div class="print-grid-item"><div class="print-label">Department</div><div class="print-val" id="printDept">-</div></div>
-            <div class="print-grid-item"><div class="print-label">Current Priority</div><div class="print-val" id="printPriority">-</div></div>
-            <div class="print-grid-item" style="grid-column: span 3;"><div class="print-label">Hardware Specifications (CPU / RAM / Storage)</div><div class="print-val" id="printSpecs">-</div></div>
+          <!-- Section 1: Client Information -->
+          <div class="dpwh-section-header">CLIENT'S INFORMATION and SERVICE REQUEST</div>
+          <table class="dpwh-form-table">
+            <tr>
+              <td class="dpwh-label">Full Name:</td>
+              <td class="dpwh-val" id="printClientName" style="width: 45%;">-</td>
+              <td class="dpwh-label">Date of Filing:</td>
+              <td class="dpwh-val" id="printDateFiling">-</td>
+            </tr>
+            <tr>
+              <td class="dpwh-label">Section/Division:</td>
+              <td class="dpwh-val" id="printSection">-</td>
+              <td class="dpwh-label">Contact No.:</td>
+              <td class="dpwh-val" id="printContact">-</td>
+            </tr>
+            <tr>
+              <td colspan="4">
+                <strong>Brief description of the Incident or Request:</strong>
+                <div class="dpwh-lines-box" id="printIncident">-</div>
+              </td>
+            </tr>
+          </table>
+          <div class="dpwh-sig-row">
+            <div class="dpwh-sig-block">
+              <strong id="printClientSigName">Client's Signature</strong><br>
+              Client's Signature over Printed Name
+            </div>
           </div>
 
-          <div class="print-section-title">2. Reported Symptom / Problem Description</div>
-          <div class="print-text-box" id="printIssue">-</div>
+          <!-- Section 2: Technical Assessment -->
+          <div class="dpwh-section-header">I.T. SUPPORT TECHNICAL ASSESSMENT</div>
+          
+          <div class="dpwh-sub-header">Hardware</div>
+          <table class="dpwh-form-table">
+            <tr>
+              <td class="dpwh-label">Type:</td>
+              <td class="dpwh-val" id="printHwType" style="width: 35%;">-</td>
+              <td class="dpwh-label">Serial Number:</td>
+              <td class="dpwh-val" id="printHwSerial">-</td>
+            </tr>
+            <tr>
+              <td class="dpwh-label">Brand and Model:</td>
+              <td class="dpwh-val" id="printHwBrand">-</td>
+              <td class="dpwh-label">Computer Name:</td>
+              <td class="dpwh-val" id="printHwCompName">-</td>
+            </tr>
+          </table>
 
-          <div class="print-section-title">3. Technical Diagnosis & Investigation</div>
-          <div class="print-text-box" id="printDiagnosis">-</div>
+          <div class="dpwh-sub-header">Application System / Software</div>
+          <table class="dpwh-form-table">
+            <tr>
+              <td class="dpwh-label">Description:</td>
+              <td class="dpwh-val" id="printAppDesc" style="width: 65%;">-</td>
+              <td class="dpwh-label">Version:</td>
+              <td class="dpwh-val" id="printAppVer">-</td>
+            </tr>
+          </table>
 
-          <div class="print-section-title">4. Action Taken / Resolution & Parts Replaced</div>
-          <div class="print-text-box" id="printAction">-</div>
+          <div class="dpwh-sub-header">Connectivity</div>
+          <table class="dpwh-form-table">
+            <tr>
+              <td class="dpwh-label">Description:</td>
+              <td class="dpwh-val" id="printConnDesc" colspan="3">-</td>
+            </tr>
+          </table>
 
-          <div class="print-grid">
-            <div class="print-grid-item" style="grid-column: span 2;"><div class="print-label">Parts Replaced / Installed</div><div class="print-val" id="printParts">-</div></div>
-            <div class="print-grid-item"><div class="print-label">Repair Cost</div><div class="print-val" id="printCost">$0.00</div></div>
-            <div class="print-grid-item"><div class="print-label">Ticket Status</div><div class="print-val" id="printStatus">-</div></div>
-            <div class="print-grid-item" style="grid-column: span 2;"><div class="print-label">Assigned ICT Technician</div><div class="print-val" id="printTech">-</div></div>
+          <div class="dpwh-sub-header">User Account</div>
+          <table class="dpwh-form-table">
+            <tr>
+              <td class="dpwh-label">Description:</td>
+              <td class="dpwh-val" id="printUserAcct" colspan="3">-</td>
+            </tr>
+          </table>
+
+          <div class="dpwh-sub-header">Assessment</div>
+          <div class="dpwh-lines-box" id="printAssessment">-</div>
+
+          <div class="dpwh-sub-header">Actions Taken and/or Recommendations</div>
+          <div class="dpwh-lines-box" id="printActionsTaken">-</div>
+
+          <table class="dpwh-form-table">
+            <tr>
+              <td style="width: 45%;">
+                <strong>Mode of Filing:</strong> &nbsp;
+                <span id="printModeWalkin">[ ] Walk-in</span> &nbsp;
+                <span id="printModePhone">[ ] Telephone Call</span> &nbsp;
+                <span id="printModeEmail">[ ] Email</span>
+                <div style="margin-top: 4px;">Date and Time Received: <strong id="printDateReceived">-</strong></div>
+                <div>Date and Time Completed: <strong id="printDateCompleted">-</strong></div>
+              </td>
+              <td>
+                <div style="margin-bottom: 24px;">Fulfilled by: <strong id="printFulfilledBy">-</strong></div>
+                <div style="font-size: 9px; border-top: 1px solid #000; padding-top: 2px; text-align: center;">Signature over Printed Name</div>
+              </td>
+              <td>
+                <div style="margin-bottom: 24px;">Reviewed by: <strong id="printReviewedBy">-</strong></div>
+                <div style="font-size: 9px; border-top: 1px solid #000; padding-top: 2px; text-align: center;">Signature over Printed Name</div>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Section 3: Client Evaluation -->
+          <div class="dpwh-section-header">CLIENT'S EVALUATION</div>
+          <div class="dpwh-eval-grid">
+            <div class="dpwh-eval-q">
+              <span>1. Was your concern/problem properly addressed?</span>
+              <div class="dpwh-checkbox-group">
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckYes"> </span> Yes</span>
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckNo"> </span> No</span>
+              </div>
+            </div>
+            <div class="dpwh-eval-q">
+              <span>2. How satisfied are you with the IT support/service you received?</span>
+              <div class="dpwh-checkbox-group">
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSupVery"> </span> Very Satisfied</span>
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSupSat"> </span> Satisfied</span>
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSupNot"> </span> Not Satisfied</span>
+              </div>
+            </div>
+            <div class="dpwh-eval-q">
+              <span>3. How satisfied are you with the effectiveness of the solution?</span>
+              <div class="dpwh-checkbox-group">
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSolVery"> </span> Very Satisfied</span>
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSolSat"> </span> Satisfied</span>
+                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSolNot"> </span> Not Satisfied</span>
+              </div>
+            </div>
+
+            <div style="margin-top: 6px;">
+              <strong>Comments and/or Suggestions:</strong>
+              <div style="border-bottom: 1px dotted #666; min-height: 22px; padding: 2px 4px;" id="printComments">-</div>
+            </div>
+          </div>
+          <div class="dpwh-sig-row">
+            <div class="dpwh-sig-block">
+              <strong>Client's Signature</strong>
+            </div>
           </div>
 
-          <div class="print-signatures">
-            <div class="sig-box">
-              <div style="height: 45px;"></div>
-              <strong>ICT Technician Signature & Date</strong>
-            </div>
-            <div class="sig-box">
-              <div style="height: 45px;"></div>
-              <strong>Asset Owner Sign-off (<span id="printOwnerSigLabel">User</span>)</strong>
-            </div>
+          <div class="dpwh-footer">
+            <div>ICT Office Hotline No.: xxxxx &nbsp;|&nbsp; Email: sample_email@dpwh.gov.ph</div>
+            <div style="text-align: right;">Your one-stop-shop for IT issues and concerns!</div>
           </div>
         </div>
 
       </div>
       <div class="modal-footer">
         <button class="btn btn-secondary btn-close-modal">Close</button>
-        <button class="btn btn-primary" onclick="printCurrentSheet()">🖨️ Print Document</button>
+        <button class="btn btn-primary" onclick="printCurrentSheet()">🖨️ Print Form</button>
       </div>
     </div>
   </div>

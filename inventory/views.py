@@ -13,18 +13,20 @@ def index(request):
     return render(request, 'index.html')
 
 
-def generate_next_job_no():
-    current_year = datetime.datetime.now().year
-    prefix = f"JOB-{current_year}-"
-    latest = JobSheet.objects.filter(job_no__startswith=prefix).order_by('-id').first()
+def generate_next_ref_no():
+    """Generate Ref. No. in format YYYY-MM-NNN (e.g. 2026-09-001)."""
+    now = datetime.datetime.now()
+    year_month = now.strftime("%Y-%m")
+    prefix = f"{year_month}-"
+    latest = JobSheet.objects.filter(ref_no__startswith=prefix).order_by('-id').first()
     if not latest:
-        return f"{prefix}0001"
+        return f"{prefix}001"
     try:
-        last_seq = int(latest.job_no.split("-")[-1])
+        last_seq = int(latest.ref_no.split("-")[-1])
         next_seq = last_seq + 1
     except (ValueError, IndexError):
         next_seq = 1
-    return f"{prefix}{next_seq:04d}"
+    return f"{prefix}{next_seq:03d}"
 
 
 def stats_api(request):
@@ -62,22 +64,23 @@ def assets_api(request):
         search = request.GET.get("search", "").strip()
         if search:
             qs = qs.filter(
-                Q(asset_tag__icontains=search) |
-                Q(serial_no__icontains=search) |
+                Q(end_user__icontains=search) |
+                Q(serial_number__icontains=search) |
                 Q(brand_model__icontains=search) |
-                Q(owner_name__icontains=search) |
-                Q(department__icontains=search) |
-                Q(processor__icontains=search) |
-                Q(location__icontains=search)
+                Q(computer_name__icontains=search) |
+                Q(monitor_serial__icontains=search) |
+                Q(ups_serial__icontains=search) |
+                Q(office__icontains=search) |
+                Q(processor__icontains=search)
             )
 
         status = request.GET.get("status", "").strip()
         if status:
             qs = qs.filter(status=status)
 
-        device_type = request.GET.get("device_type", "").strip()
-        if device_type:
-            qs = qs.filter(device_type=device_type)
+        device = request.GET.get("device", "").strip()
+        if device:
+            qs = qs.filter(device=device)
 
         return JsonResponse([a.to_dict(include_history=False) for a in qs], safe=False)
 
@@ -87,34 +90,33 @@ def assets_api(request):
         except Exception:
             return JsonResponse({"error": "Invalid JSON body"}, status=400)
 
-        if not data.get("asset_tag") or not data.get("serial_no") or not data.get("brand_model"):
-            return JsonResponse({"error": "Asset Tag, Serial No, and Brand/Model are required"}, status=400)
+        end_user = data.get("end_user", "").strip()
+        brand_model = data.get("brand_model", "").strip()
+        serial_number = data.get("serial_number", "").strip().upper()
 
-        tag = data["asset_tag"].strip().upper()
-        serial = data["serial_no"].strip().upper()
+        if not end_user or not brand_model or not serial_number:
+            return JsonResponse({"error": "End-User, Brand & Model, and Serial Number are required."}, status=400)
 
-        if Asset.objects.filter(asset_tag=tag).exists():
-            return JsonResponse({"error": f"Asset Tag '{tag}' is already registered."}, status=400)
-        if Asset.objects.filter(serial_no=serial).exists():
-            return JsonResponse({"error": f"Serial No '{serial}' is already registered."}, status=400)
+        if Asset.objects.filter(serial_number=serial_number).exists():
+            return JsonResponse({"error": f"Serial Number '{serial_number}' is already registered in the system."}, status=400)
 
         asset = Asset.objects.create(
-            asset_tag=tag,
-            serial_no=serial,
-            device_type=data.get("device_type", "Desktop"),
-            brand_model=data.get("brand_model", "").strip(),
+            end_user=end_user,
+            device=data.get("device", "Desktop"),
+            brand_model=brand_model,
+            serial_number=serial_number,
+            computer_name=data.get("computer_name", "").strip(),
+            monitor_serial=data.get("monitor_serial", "").strip(),
+            ups_serial=data.get("ups_serial", "").strip(),
+            office=data.get("office", "ODE-ICTS").strip(),
+            status=data.get("status", "In Use"),
+            asset_tag=data.get("asset_tag", "").strip(),
             processor=data.get("processor", "").strip(),
             ram=data.get("ram", "").strip(),
             storage=data.get("storage", "").strip(),
             gpu=data.get("gpu", "").strip(),
             os=data.get("os", "").strip(),
-            owner_name=data.get("owner_name", "Unassigned").strip(),
-            department=data.get("department", "General Pool").strip(),
-            location=data.get("location", "").strip(),
-            status=data.get("status", "In Use"),
-            purchase_date=data.get("purchase_date", ""),
-            warranty_expiry=data.get("warranty_expiry", ""),
-            notes=data.get("notes", "")
+            notes=data.get("notes", "").strip()
         )
         return JsonResponse(asset.to_dict(include_history=False), status=201)
 
@@ -134,20 +136,15 @@ def asset_detail_api(request, asset_id):
         except Exception:
             return JsonResponse({"error": "Invalid JSON body"}, status=400)
 
-        if "asset_tag" in data:
-            tag = data["asset_tag"].strip().upper()
-            if tag != asset.asset_tag and Asset.objects.filter(asset_tag=tag).exclude(id=asset_id).exists():
-                return JsonResponse({"error": f"Asset Tag '{tag}' is already used."}, status=400)
-            asset.asset_tag = tag
+        if "serial_number" in data:
+            new_sn = data["serial_number"].strip().upper()
+            if new_sn != asset.serial_number and Asset.objects.filter(serial_number=new_sn).exclude(id=asset_id).exists():
+                return JsonResponse({"error": f"Serial Number '{new_sn}' is already used by another computer."}, status=400)
+            asset.serial_number = new_sn
 
-        if "serial_no" in data:
-            serial = data["serial_no"].strip().upper()
-            if serial != asset.serial_no and Asset.objects.filter(serial_no=serial).exclude(id=asset_id).exists():
-                return JsonResponse({"error": f"Serial No '{serial}' is already used."}, status=400)
-            asset.serial_no = serial
-
-        for field in ["device_type", "brand_model", "processor", "ram", "storage", "gpu", "os",
-                      "owner_name", "department", "location", "status", "purchase_date", "warranty_expiry", "notes"]:
+        for field in ["end_user", "device", "brand_model", "computer_name", "monitor_serial",
+                      "ups_serial", "office", "status", "asset_tag", "processor", "ram", "storage",
+                      "gpu", "os", "notes"]:
             if field in data:
                 setattr(asset, field, data[field])
 
@@ -155,9 +152,9 @@ def asset_detail_api(request, asset_id):
         return JsonResponse(asset.to_dict(include_history=True))
 
     elif request.method == "DELETE":
-        tag = asset.asset_tag
+        sn = asset.serial_number
         asset.delete()
-        return JsonResponse({"message": f"Asset {tag} was deleted."})
+        return JsonResponse({"message": f"Asset {sn} was successfully deleted."})
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
@@ -169,14 +166,14 @@ def jobs_api(request):
         search = request.GET.get("search", "").strip()
         if search:
             qs = qs.filter(
-                Q(job_no__icontains=search) |
-                Q(issue_description__icontains=search) |
-                Q(technician_name__icontains=search) |
-                Q(parts_replaced__icontains=search) |
-                Q(asset__asset_tag__icontains=search) |
-                Q(asset__serial_no__icontains=search) |
-                Q(asset__brand_model__icontains=search) |
-                Q(asset__owner_name__icontains=search)
+                Q(ref_no__icontains=search) |
+                Q(full_name__icontains=search) |
+                Q(incident_description__icontains=search) |
+                Q(hardware_serial_number__icontains=search) |
+                Q(hardware_computer_name__icontains=search) |
+                Q(fulfilled_by__icontains=search) |
+                Q(section_division__icontains=search) |
+                Q(actions_taken__icontains=search)
             )
 
         status = request.GET.get("status", "").strip()
@@ -200,39 +197,56 @@ def jobs_api(request):
             return JsonResponse({"error": "Invalid JSON body"}, status=400)
 
         asset_id = data.get("asset_id")
-        issue = data.get("issue_description", "").strip()
+        incident_description = data.get("incident_description", "").strip() or data.get("issue_description", "").strip()
+
         if not asset_id:
-            return JsonResponse({"error": "Asset ID is required"}, status=400)
-        if not issue:
-            return JsonResponse({"error": "Issue description is required"}, status=400)
+            return JsonResponse({"error": "Computer asset selection is required."}, status=400)
+        if not incident_description:
+            return JsonResponse({"error": "Brief description of the Incident or Request is required."}, status=400)
 
         asset = get_object_or_404(Asset, id=asset_id)
 
-        job_no = data.get("job_no", "").strip()
-        if not job_no:
-            job_no = generate_next_job_no()
+        ref_no = data.get("ref_no", "").strip() or data.get("job_no", "").strip()
+        if not ref_no:
+            ref_no = generate_next_ref_no()
         else:
-            if JobSheet.objects.filter(job_no=job_no).exists():
-                return JsonResponse({"error": f"Job Sheet #{job_no} already exists."}, status=400)
+            if JobSheet.objects.filter(ref_no=ref_no).exists():
+                return JsonResponse({"error": f"Job Sheet Ref. No. '{ref_no}' already exists."}, status=400)
 
-        date_received = data.get("date_received") or datetime.date.today().isoformat()
+        date_of_filing = data.get("date_of_filing") or datetime.date.today().isoformat()
 
         job = JobSheet.objects.create(
-            job_no=job_no,
+            ref_no=ref_no,
             asset=asset,
-            issue_description=issue,
-            priority=data.get("priority", "Medium"),
+            full_name=data.get("full_name", "").strip() or asset.end_user,
+            section_division=data.get("section_division", "").strip() or asset.office,
+            date_of_filing=date_of_filing,
+            contact_no=data.get("contact_no", "").strip(),
+            incident_description=incident_description,
+            hardware_type=data.get("hardware_type", asset.device),
+            hardware_brand_model=data.get("hardware_brand_model", asset.brand_model),
+            hardware_serial_number=data.get("hardware_serial_number", asset.serial_number),
+            hardware_computer_name=data.get("hardware_computer_name", asset.computer_name),
+            app_software_description=data.get("app_software_description", "").strip(),
+            app_software_version=data.get("app_software_version", "").strip(),
+            connectivity_description=data.get("connectivity_description", "").strip(),
+            user_account_description=data.get("user_account_description", "").strip(),
+            assessment=data.get("assessment", "").strip(),
+            actions_taken=data.get("actions_taken", "").strip(),
+            mode_of_filing=data.get("mode_of_filing", "Walk-in"),
+            date_time_received=data.get("date_time_received", date_of_filing),
+            date_time_completed=data.get("date_time_completed", ""),
+            fulfilled_by=data.get("fulfilled_by", "").strip() or data.get("technician_name", "").strip(),
+            reviewed_by=data.get("reviewed_by", "").strip(),
             status=data.get("status", "Open"),
-            technician_name=data.get("technician_name", "").strip(),
-            diagnosis=data.get("diagnosis", "").strip(),
-            action_taken=data.get("action_taken", "").strip(),
-            parts_replaced=data.get("parts_replaced", "").strip(),
-            cost=float(data.get("cost") or 0.0),
-            date_received=date_received,
-            date_completed=data.get("date_completed") or None,
-            remarks=data.get("remarks", "").strip()
+            priority=data.get("priority", "Medium"),
+            concern_addressed=data.get("concern_addressed", ""),
+            it_support_satisfaction=data.get("it_support_satisfaction", ""),
+            solution_satisfaction=data.get("solution_satisfaction", ""),
+            comments_suggestions=data.get("comments_suggestions", "").strip()
         )
 
+        # Sync asset status to Under Repair if ticket is active
         if data.get("set_asset_under_repair", True) and job.status in ["Open", "In Progress", "Waiting for Parts"]:
             asset.status = "Under Repair"
             asset.save()
@@ -255,17 +269,27 @@ def job_detail_api(request, job_id):
         except Exception:
             return JsonResponse({"error": "Invalid JSON body"}, status=400)
 
-        for field in ["issue_description", "priority", "status", "technician_name",
-                      "diagnosis", "action_taken", "parts_replaced", "date_received",
-                      "date_completed", "remarks"]:
+        for field in ["full_name", "section_division", "date_of_filing", "contact_no",
+                      "incident_description", "hardware_type", "hardware_brand_model",
+                      "hardware_serial_number", "hardware_computer_name",
+                      "app_software_description", "app_software_version",
+                      "connectivity_description", "user_account_description",
+                      "assessment", "actions_taken", "mode_of_filing",
+                      "date_time_received", "date_time_completed",
+                      "fulfilled_by", "reviewed_by", "status", "priority",
+                      "concern_addressed", "it_support_satisfaction",
+                      "solution_satisfaction", "comments_suggestions"]:
             if field in data:
                 setattr(job, field, data[field])
 
-        if "cost" in data:
-            job.cost = float(data["cost"] or 0.0)
+        # Backward-compat aliases
+        if "issue_description" in data and not data.get("incident_description"):
+            job.incident_description = data["issue_description"]
+        if "technician_name" in data and not data.get("fulfilled_by"):
+            job.fulfilled_by = data["technician_name"]
 
-        if job.status in ["Resolved", "Closed"] and not job.date_completed:
-            job.date_completed = datetime.date.today().isoformat()
+        if job.status in ["Resolved", "Closed"] and not job.date_time_completed:
+            job.date_time_completed = datetime.datetime.now().strftime("%Y-%m-%d %H:%M")
 
         if data.get("update_asset_status") and job.asset:
             job.asset.status = data["update_asset_status"]
@@ -275,30 +299,56 @@ def job_detail_api(request, job_id):
         return JsonResponse(job.to_dict(include_asset=True))
 
     elif request.method == "DELETE":
-        job_no = job.job_no
+        ref = job.ref_no
         job.delete()
-        return JsonResponse({"message": f"Job Sheet {job_no} deleted."})
+        return JsonResponse({"message": f"Job Sheet {ref} was deleted."})
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
 
 
 def export_csv(request):
-    assets = Asset.objects.all().order_by('asset_tag')
+    """
+    Exports CSV formatted matching the user's Excel Inventory Sheet:
+    END-USER | DEVICE | BRAND and MODEL | SERIAL NUMBER | COMPUTER NAME | MONITOR with SERIAL NUMBER | UPS with SERIAL NUMBER | OFFICE | REPAIR HISTORY
+    """
+    assets = Asset.objects.all().order_by('end_user', 'serial_number')
     response = HttpResponse(content_type='text/csv')
-    response['Content-Disposition'] = 'attachment; filename="ICT_Hardware_Inventory.csv"'
+    response['Content-Disposition'] = 'attachment; filename="ICT_Computer_Inventory.csv"'
 
     writer = csv.writer(response)
     writer.writerow([
-        "Asset Tag", "Serial No", "Device Type", "Brand / Model", "Processor", "RAM", "Storage",
-        "GPU", "Operating System", "Owner Name", "Department", "Location", "Status",
-        "Purchase Date", "Warranty Expiry", "Total Repairs", "Notes"
+        "END-USER",
+        "DEVICE",
+        "BRAND and MODEL",
+        "SERIAL NUMBER",
+        "COMPUTER NAME",
+        "MONITOR with SERIAL NUMBER",
+        "UPS with SERIAL NUMBER",
+        "OFFICE",
+        "REPAIR HISTORY"
     ])
 
     for a in assets:
+        # Build repair history summary string
+        repairs = a.job_sheets.all()
+        if repairs.exists():
+            repair_history_str = "; ".join([
+                f"[{j.ref_no}] {j.date_of_filing}: {j.incident_description[:50]} (Status: {j.status}, Tech: {j.fulfilled_by})"
+                for j in repairs
+            ])
+        else:
+            repair_history_str = "None"
+
         writer.writerow([
-            a.asset_tag, a.serial_no, a.device_type, a.brand_model, a.processor, a.ram, a.storage,
-            a.gpu, a.os, a.owner_name, a.department, a.location, a.status,
-            a.purchase_date, a.warranty_expiry, a.job_sheets.count(), a.notes
+            a.end_user,
+            a.device,
+            a.brand_model,
+            a.serial_number,
+            a.computer_name or "",
+            a.monitor_serial or "",
+            a.ups_serial or "",
+            a.office,
+            repair_history_str
         ])
 
     return response

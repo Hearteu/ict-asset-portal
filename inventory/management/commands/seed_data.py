@@ -3,175 +3,148 @@ from inventory.models import Asset, JobSheet
 
 
 class Command(BaseCommand):
-    help = 'Seeds initial ICT assets and job sheet repair history into Django database'
+    help = 'Seeds DPWH ODE-ICTS computer assets and official job sheet records'
 
     def handle(self, *args, **kwargs):
-        if Asset.objects.exists():
-            self.stdout.write(self.style.WARNING("Database already has records. Skipping seed."))
-            return
+        # Reset and seed with user spreadsheet data
+        JobSheet.objects.all().delete()
+        Asset.objects.all().delete()
 
-        self.stdout.write("Seeding ICT computers and repair job sheets...")
+        self.stdout.write("Populating DPWH ODE-ICTS computer inventory and job sheet records...")
 
+        # 1. Stephen C. Maybanting - HP Pro 3330MT
         a1 = Asset.objects.create(
-            asset_tag="ICT-NB-001",
-            serial_no="5CD2048XYZ",
-            device_type="Laptop",
-            brand_model="Dell Latitude 5420",
-            processor="Intel Core i7-1185G7 @ 3.00GHz (4 Cores, 8 Threads)",
-            ram="16 GB DDR4-3200MHz",
-            storage="512 GB NVMe M.2 SSD",
-            gpu="Intel Iris Xe Graphics",
-            os="Windows 11 Pro 64-bit",
-            owner_name="Elena Rostova",
-            department="Finance",
-            location="HQ Building A, Level 3, Desk 304",
+            end_user="Stephen C. Maybanting",
+            device="Desktop",
+            brand_model="HP Pro 3330MT",
+            serial_number="SGH303QPNH",
+            computer_name="ODE-ICTS-DT01",
+            monitor_serial="HP V203p (CN49200XYZ)",
+            ups_serial="APC Back-UPS 650VA (BB190401)",
+            office="ODE-ICTS",
             status="In Use",
-            purchase_date="2024-03-15",
-            warranty_expiry="2027-03-15",
-            notes="Company issued laptop with docking station."
-        )
-
-        a2 = Asset.objects.create(
-            asset_tag="ICT-NB-002",
-            serial_no="PF3910A9-LEN",
-            device_type="Laptop",
-            brand_model="Lenovo ThinkPad T14 Gen 3",
-            processor="AMD Ryzen 7 PRO 6850U (8 Cores, 16 Threads)",
-            ram="32 GB LPDDR5-6400MHz",
-            storage="1 TB PCIe 4.0 NVMe SSD",
-            gpu="Integrated AMD Radeon 680M",
-            os="Windows 11 Pro 64-bit",
-            owner_name="David Miller",
-            department="Engineering",
-            location="HQ Building B, Level 2, Desk 210",
-            status="In Use",
-            purchase_date="2024-06-20",
-            warranty_expiry="2027-06-20",
-            notes="Configured with WSL2 and Docker development stack."
-        )
-
-        a3 = Asset.objects.create(
-            asset_tag="ICT-DT-001",
-            serial_no="CZ293108B-HP",
-            device_type="Desktop",
-            brand_model="HP EliteDesk 800 G6 Mini Desktop",
-            processor="Intel Core i5-10500 @ 3.10GHz",
-            ram="16 GB DDR4-2933MHz",
-            storage="256 GB NVMe SSD + 1 TB SATA HDD",
-            gpu="Intel UHD Graphics 630",
+            processor="Intel Core i5-3470 @ 3.20GHz",
+            ram="8 GB DDR3",
+            storage="500 GB SATA HDD",
             os="Windows 10 Pro 64-bit",
-            owner_name="Reception Kiosk",
-            department="Operations / Front Desk",
-            location="HQ Ground Floor Lobby",
+            notes="Primary workstation at ODE-ICTS."
+        )
+
+        # 2. Vanessa G. Gamil - HP EliteDesk 800 G3
+        a2 = Asset.objects.create(
+            end_user="Vanessa G. Gamil",
+            device="Desktop",
+            brand_model="HP EliteDesk 800 G3",
+            serial_number="SGH735PWSW",
+            computer_name="ODE-ICTS-DT02",
+            monitor_serial="HP EliteDisplay E233 (3CQ8141ABC)",
+            ups_serial="APC Back-UPS 650VA (BB201102)",
+            office="ODE-ICTS",
             status="In Use",
-            purchase_date="2023-08-10",
-            warranty_expiry="2026-08-10",
-            notes="Dedicated visitor badge printing and sign-in terminal."
+            processor="Intel Core i7-7700 @ 3.60GHz",
+            ram="16 GB DDR4",
+            storage="256 GB NVMe SSD + 1 TB HDD",
+            os="Windows 10 Pro 64-bit",
+            notes="Workstation configured with DPWH intranet applications."
         )
 
-        a4 = Asset.objects.create(
-            asset_tag="ICT-WS-001",
-            serial_no="8GH21901Q-DELL",
-            device_type="Workstation",
-            brand_model="Dell Precision 3660 Tower",
-            processor="Intel Core i9-13900K @ 3.00GHz (24 Cores, 32 Threads)",
-            ram="64 GB DDR5-4800MHz (2x32GB)",
-            storage="2 TB Samsung 990 Pro NVMe + 4 TB Seagate Enterprise HDD",
-            gpu="NVIDIA RTX A4000 16GB GDDR6",
-            os="Windows 11 Pro for Workstations",
-            owner_name="Dr. Aris Thorne",
-            department="Research & Development",
-            location="Tech Lab, Room 108",
+        # 3. Jadin M. Fronteras - HP EliteDesk 800 G3
+        a3 = Asset.objects.create(
+            end_user="Jadin M. Fronteras",
+            device="Desktop",
+            brand_model="HP EliteDesk 800 G3",
+            serial_number="SGH745RGZZ",
+            computer_name="ODE-ICTS-DT03",
+            monitor_serial="HP EliteDisplay E233 (3CQ8141DEF)",
+            ups_serial="APC Back-UPS 650VA (BB201105)",
+            office="ODE-ICTS",
             status="In Use",
-            purchase_date="2024-01-12",
-            warranty_expiry="2027-01-12",
-            notes="High compute workstation for 3D modeling and rendering."
-        )
-
-        a5 = Asset.objects.create(
-            asset_tag="ICT-NB-003",
-            serial_no="L3N0CV012-ASUS",
-            device_type="Laptop",
-            brand_model="Asus ExpertBook B9450",
-            processor="Intel Core i7-1165G7 @ 2.80GHz",
-            ram="16 GB LPDDR4X",
-            storage="1 TB Samsung PCIe NVMe SSD",
-            gpu="Intel Iris Xe Graphics",
-            os="Windows 11 Pro 64-bit",
-            owner_name="Rachel Green",
-            department="Legal",
-            location="HQ Building A, Level 4, Desk 412",
-            status="Under Repair",
-            purchase_date="2023-11-05",
-            warranty_expiry="2026-11-05",
-            notes="Sent to ICT due to screen flickering and swollen touchpad."
-        )
-
-        a6 = Asset.objects.create(
-            asset_tag="ICT-DT-002",
-            serial_no="MJ09A410-LEN",
-            device_type="Desktop",
-            brand_model="Lenovo ThinkCentre M70q Tiny",
-            processor="Intel Core i5-12400T @ 1.80GHz",
-            ram="16 GB DDR4-3200MHz",
+            processor="Intel Core i7-7700 @ 3.60GHz",
+            ram="16 GB DDR4",
             storage="512 GB NVMe SSD",
-            gpu="Intel UHD Graphics 730",
             os="Windows 11 Pro 64-bit",
-            owner_name="Unassigned",
-            department="ICT Reserve / Spare Pool",
-            location="ICT Storeroom Server Rack C, Shelf 2",
-            status="Available / Spare",
-            purchase_date="2024-05-18",
-            warranty_expiry="2027-05-18",
-            notes="Clean image deployed, ready for immediate assignment."
+            notes="Assigned at Planning and Design / ICT support pool."
         )
 
-        JobSheet.objects.create(
-            job_no="JOB-2025-0089",
-            asset=a1,
-            issue_description="Laptop shutting down intermittently under load; extreme fan noise reported by user.",
-            priority="Medium",
-            status="Resolved",
-            technician_name="Alex Wong (ICT Support)",
-            diagnosis="Heatsink fins clogged with dense dust buildup; factory thermal paste was completely dried out.",
-            action_taken="Disassembled chassis, ultrasonically cleaned cooling fan and heatsink. Applied Arctic MX-4 thermal compound. Ran AIDA64 stress test for 60 minutes with max temp peaking at 74C.",
-            parts_replaced="Arctic MX-4 thermal paste",
-            cost=15.00,
-            date_received="2025-11-14",
-            date_completed="2025-11-15",
-            remarks="Unit returned to user in optimal working condition."
+        # 4. Stephen C. Maybanting - HP EliteDesk 800 G3 (Secondary/Upgrade)
+        a4 = Asset.objects.create(
+            end_user="Stephen C. Maybanting",
+            device="Desktop",
+            brand_model="HP EliteDesk 800 G3",
+            serial_number="SGH745RH01",
+            computer_name="ODE-ICTS-DT04",
+            monitor_serial="HP EliteDisplay E233 (3CQ8141GHI)",
+            ups_serial="APC Back-UPS 650VA (BB201109)",
+            office="ODE-ICTS",
+            status="Under Repair",
+            processor="Intel Core i7-7700 @ 3.60GHz",
+            ram="16 GB DDR4",
+            storage="256 GB SSD",
+            os="Windows 10 Pro 64-bit",
+            notes="Currently undergoing system restoration and thermal maintenance."
         )
 
-        JobSheet.objects.create(
-            job_no="JOB-2026-0004",
+        # Create realistic DPWH Job Sheets
+        j1 = JobSheet.objects.create(
+            ref_no="2026-09-001",
             asset=a4,
-            issue_description="User requested storage upgrade and secondary high-speed scratch disk for video & photogrammetry pipeline.",
-            priority="Low",
-            status="Resolved",
-            technician_name="Samira Patel (ICT Hardware Lead)",
-            diagnosis="Primary OS drive had only 12% free capacity remaining.",
-            action_taken="Installed additional 2TB PCIe 4.0 NVMe SSD into M.2 Slot 2. Initialized GPT partition as D: Scratch with BitLocker enabled.",
-            parts_replaced="Samsung 990 Pro 2TB NVMe PCIe 4.0 M.2 SSD",
-            cost=189.99,
-            date_received="2026-02-10",
-            date_completed="2026-02-11",
-            remarks="User confirmed substantial speed boost in rendering workflow."
-        )
-
-        JobSheet.objects.create(
-            job_no="JOB-2026-0012",
-            asset=a5,
-            issue_description="Screen flickering when lid is moved; touchpad is bulging and difficult to click.",
-            priority="High",
+            full_name="Stephen C. Maybanting",
+            section_division="ODE-ICTS",
+            date_of_filing="2026-09-14",
+            contact_no="Local 4102",
+            incident_description="Computer randomly freezing during report generation. System fan spinning continuously at maximum speed.",
+            hardware_type="Desktop",
+            hardware_brand_model="HP EliteDesk 800 G3",
+            hardware_serial_number="SGH745RH01",
+            hardware_computer_name="ODE-ICTS-DT04",
+            app_software_description="Operating System and DPWH Executive Information System",
+            app_software_version="Windows 10 Pro 22H2",
+            connectivity_description="LAN connection normal, DHCP IP assigned",
+            user_account_description="Standard domain user account",
+            assessment="Thermal throttling detected due to dried heatsink compound. Hard drive SMART diagnostic showed bad sectors on secondary data drive.",
+            actions_taken="Cleaned chassis and CPU blower fan. Replaced dried thermal compound with high-grade thermal paste. Replaced failing hard drive and re-imaged OS. Ran burn-in test.",
+            mode_of_filing="Walk-in",
+            date_time_received="2026-09-14 08:30 AM",
+            date_time_completed="2026-09-15 04:00 PM",
+            fulfilled_by="Engr. J. Dela Cruz (ICT Support)",
+            reviewed_by="Head, ICT Unit",
             status="In Progress",
-            technician_name="Alex Wong (ICT Support)",
-            diagnosis="Battery cell swelling (safety hazard). Also loose eDP display ribbon cable at motherboard hinge.",
-            action_taken="Immediately removed swollen lithium battery and safely quarantined it in battery disposal bin. Ordered OEM Asus 66Wh replacement battery pack. Reseated and taped eDP cable.",
-            parts_replaced="Awaiting OEM 66Wh battery (P/N: C41N1908)",
-            cost=75.00,
-            date_received="2026-09-12",
-            date_completed=None,
-            remarks="Awaiting courier delivery of replacement battery pack. Estimated arrival 2 business days."
+            priority="High",
+            concern_addressed="Yes",
+            it_support_satisfaction="Very Satisfied",
+            solution_satisfaction="Very Satisfied",
+            comments_suggestions="Prompt diagnosis and immediate replacement of storage drive."
         )
 
-        self.stdout.write(self.style.SUCCESS("Django database successfully populated with ICT assets and job sheets!"))
+        j2 = JobSheet.objects.create(
+            ref_no="2026-08-015",
+            asset=a2,
+            full_name="Vanessa G. Gamil",
+            section_division="ODE-ICTS",
+            date_of_filing="2026-08-20",
+            contact_no="Local 4105",
+            incident_description="Request for network printer configuration and DPWH Document Tracking System installation.",
+            hardware_type="Desktop",
+            hardware_brand_model="HP EliteDesk 800 G3",
+            hardware_serial_number="SGH735PWSW",
+            hardware_computer_name="ODE-ICTS-DT02",
+            app_software_description="DPWH DoTS (Document Tracking System)",
+            app_software_version="v4.2.1",
+            connectivity_description="Static IP configuration for network shared printer access",
+            user_account_description="User account credentials verified",
+            assessment="Client workstation lacks printer driver package and DoTS desktop client prerequisites.",
+            actions_taken="Installed HP Universal Print Driver via network IP port. Deployed DoTS client software and tested document routing successfully.",
+            mode_of_filing="Walk-in",
+            date_time_received="2026-08-20 09:15 AM",
+            date_time_completed="2026-08-20 10:30 AM",
+            fulfilled_by="Engr. J. Dela Cruz (ICT Support)",
+            reviewed_by="Head, ICT Unit",
+            status="Resolved",
+            priority="Medium",
+            concern_addressed="Yes",
+            it_support_satisfaction="Very Satisfied",
+            solution_satisfaction="Very Satisfied",
+            comments_suggestions="Fast and accommodating service."
+        )
+
+        self.stdout.write(self.style.SUCCESS("Successfully seeded DPWH ODE-ICTS assets and job sheets!"))
