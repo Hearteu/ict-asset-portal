@@ -1132,6 +1132,8 @@ textarea.form-control {
 .dpwh-lbl-client-r {
   width: 78px;
   min-width: 78px;
+  text-align: right;
+  display: inline-block;
 }
 
 .dpwh-lbl-hw-l {
@@ -1142,6 +1144,8 @@ textarea.form-control {
 .dpwh-lbl-hw-r {
   width: 95px;
   min-width: 95px;
+  text-align: right;
+  display: inline-block;
 }
 
 .dpwh-lbl-app-desc {
@@ -1152,17 +1156,23 @@ textarea.form-control {
 .dpwh-lbl-app-ver {
   width: 50px;
   min-width: 50px;
+  text-align: right;
+  display: inline-block;
 }
 
 .dpwh-lbl-time {
-  width: 145px;
-  min-width: 145px;
+  width: 140px;
+  min-width: 140px;
+  text-align: right;
+  display: inline-block;
 }
 
 .dpwh-lbl-sign {
   width: 80px;
   min-width: 80px;
+  text-align: right;
   padding-top: 2px;
+  display: inline-block;
 }
 
 .dpwh-label-block {
@@ -1297,7 +1307,7 @@ textarea.form-control {
   flex: none;
   width: 170px;
   display: flex;
-  gap: 6px;
+  gap: 5px;
   align-items: center;
   margin-top: 1px;
 }
@@ -1313,22 +1323,22 @@ textarea.form-control {
   font-size: 9.5px;
   font-style: italic;
   text-align: center;
-  margin-top: 2px;
+  margin-top: 4px;
   color: #000;
 }
 
 /* The authentic full-width dividing line in Technical Assessment separating Actions Taken from Mode of Filing */
 .dpwh-actions-block {
   border-bottom: 1.5px solid #000000 !important;
-  padding-bottom: 4px;
+  padding-bottom: 8px;
 }
 
-/* Filing & Technicians Grid */
+/* Filing & Technicians Grid - with added vertical space below the divider line */
 .dpwh-filing-tech-grid {
   display: grid;
   grid-template-columns: 1.15fr 1fr;
   gap: 14px;
-  padding: 4px 10px 6px 10px;
+  padding: 10px 10px 6px 10px;
   box-sizing: border-box;
 }
 
@@ -1337,7 +1347,7 @@ textarea.form-control {
   align-items: center;
   font-size: 11px;
   gap: 10px;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .dpwh-checkbox {
@@ -1364,8 +1374,8 @@ textarea.form-control {
 .dpwh-time-row {
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin-bottom: 2px;
+  gap: 4px;
+  margin-bottom: 1px;
 }
 
 .dpwh-time-field {
@@ -1382,7 +1392,7 @@ textarea.form-control {
 .dpwh-sign-row {
   display: flex;
   align-items: flex-start;
-  gap: 8px;
+  gap: 6px;
 }
 
 .dpwh-sig-block {
@@ -1420,8 +1430,9 @@ textarea.form-control {
   white-space: nowrap;
 }
 
-/* Client Evaluation */
+/* Client Evaluation - with vertical spacing above Q1 and aligned options grid */
 .dpwh-eval-questions {
+  margin-top: 10px;
   margin-bottom: 6px;
 }
 
@@ -1429,7 +1440,7 @@ textarea.form-control {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 5px;
 }
 
 .dpwh-eval-q {
@@ -1438,16 +1449,17 @@ textarea.form-control {
 }
 
 .dpwh-eval-options {
-  display: flex;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: 115px 95px 105px;
+  gap: 8px;
 }
 
-/* Side-by-side comments & signature to prevent any overlap */
+/* Side-by-side comments & signature with vertical space between Q3 and comments */
 .dpwh-comments-sig-container {
   display: flex;
   align-items: flex-end;
   gap: 16px;
-  margin-top: 6px;
+  margin-top: 14px;
   width: 100%;
 }
 
