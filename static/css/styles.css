@@ -186,14 +186,15 @@ body {
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+  width: calc(100% - 270px);
 }
 
 /* Top Navbar */
 .topbar {
   height: 70px;
-  padding: 0 32px;
+  padding: 0 24px;
   border-bottom: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(12px);
   display: flex;
   align-items: center;
@@ -201,21 +202,24 @@ body {
   position: sticky;
   top: 0;
   z-index: 40;
+  gap: 16px;
 }
 
 .global-search-container {
   position: relative;
-  width: 420px;
+  flex: 1;
+  max-width: 400px;
+  min-width: 220px;
 }
 
 .global-search-container input {
   width: 100%;
-  padding: 10px 16px 10px 42px;
+  padding: 9px 14px 9px 38px;
   background: rgba(30, 41, 59, 0.8);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   color: var(--text-primary);
-  font-size: 0.88rem;
+  font-size: 0.86rem;
   transition: var(--transition);
 }
 
@@ -228,31 +232,33 @@ body {
 
 .search-icon {
   position: absolute;
-  left: 14px;
+  left: 12px;
   top: 50%;
   transform: translateY(-50%);
   color: var(--text-muted);
   pointer-events: none;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
 }
 
 .topbar-actions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 9px 16px;
+  gap: 6px;
+  padding: 8px 14px;
   border-radius: var(--radius-md);
-  font-size: 0.86rem;
+  font-size: 0.82rem;
   font-weight: 600;
   cursor: pointer;
   transition: var(--transition);
   border: 1px solid transparent;
+  white-space: nowrap;
 }
 
 .btn-primary {
@@ -453,26 +459,33 @@ body {
   width: 100%;
   border-collapse: collapse;
   text-align: left;
-  font-size: 0.86rem;
+  font-size: 0.82rem;
 }
 
 .data-table th {
   background: rgba(15, 23, 42, 0.6);
-  padding: 14px 16px;
+  padding: 11px 12px;
   color: var(--text-secondary);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
-  font-size: 0.74rem;
+  font-size: 0.72rem;
   border-bottom: 1px solid var(--border-color);
   white-space: nowrap;
 }
 
 .data-table td {
-  padding: 14px 16px;
+  padding: 10px 12px;
   border-bottom: 1px solid var(--border-color);
   color: var(--text-primary);
   vertical-align: middle;
+}
+
+.action-btns-group {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  white-space: nowrap;
 }
 
 .data-table tbody tr:hover {

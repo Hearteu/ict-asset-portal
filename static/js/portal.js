@@ -68,25 +68,46 @@ function switchView(viewName) {
 
 // Global Event Listeners
 function setupEventListeners() {
-  // Global Search
+  // Global Top Search Bar
   const globalSearch = document.getElementById("globalSearch");
-  globalSearch.addEventListener("input", (e) => {
-    const val = e.target.value.trim().toLowerCase();
+  globalSearch?.addEventListener("input", (e) => {
+    const val = e.target.value;
     filterDataGlobally(val);
+    const assetSearch = document.getElementById("assetSearchInput");
+    if (assetSearch && document.activeElement === globalSearch) {
+      assetSearch.value = val;
+    }
   });
 
-  // Asset Filter Controls
+  // Asset Inventory Search Bar
+  const assetSearch = document.getElementById("assetSearchInput");
+  assetSearch?.addEventListener("input", (e) => {
+    const val = e.target.value;
+    filterDataGlobally(val);
+    if (globalSearch && document.activeElement === assetSearch) {
+      globalSearch.value = val;
+    }
+  });
+
+  // Asset Dropdown Filters
   document.getElementById("assetStatusFilter")?.addEventListener("change", loadAssets);
   document.getElementById("assetTypeFilter")?.addEventListener("change", loadAssets);
-  document.getElementById("assetSearchInput")?.addEventListener("input", loadAssets);
 
-  // Job Filter Controls
+  // Job Sheet Search Bar
+  const jobSearch = document.getElementById("jobSearchInput");
+  jobSearch?.addEventListener("input", (e) => {
+    const val = e.target.value;
+    filterDataGlobally(val);
+  });
   document.getElementById("jobStatusFilter")?.addEventListener("change", loadJobs);
   document.getElementById("jobPriorityFilter")?.addEventListener("change", loadJobs);
-  document.getElementById("jobSearchInput")?.addEventListener("input", loadJobs);
 
   // History Filter
-  document.getElementById("historySearchInput")?.addEventListener("input", loadRepairHistory);
+  const historySearch = document.getElementById("historySearchInput");
+  historySearch?.addEventListener("input", (e) => {
+    const val = e.target.value;
+    filterDataGlobally(val);
+  });
 
   // Modal Close buttons
   document.querySelectorAll(".modal-close-btn, .btn-close-modal").forEach(btn => {
@@ -198,16 +219,16 @@ function renderAssetsTable(assets) {
   if (!tbody) return;
 
   if (assets.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="10" style="text-align:center; padding: 30px; color: var(--text-muted);">No computers found matching your criteria.</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding: 30px; color: var(--text-muted);">No computers found matching your criteria.</td></tr>`;
     return;
   }
 
-  // Exact Excel Columns:
-  // END-USER | DEVICE | BRAND and MODEL | SERIAL NUMBER | COMPUTER NAME | MONITOR with S/N | UPS with S/N | OFFICE | REPAIR HISTORY | ACTIONS
+  // Exact Excel Columns without redundant repair history column:
+  // END-USER | DEVICE | BRAND and MODEL | SERIAL NUMBER | COMPUTER NAME | MONITOR with S/N | UPS with S/N | OFFICE | ACTIONS
   tbody.innerHTML = assets.map(a => `
     <tr>
       <td>
-        <strong style="color: #38bdf8; cursor: pointer;" onclick="viewAssetDetails(${a.id})" title="Click to view full profile">${a.end_user}</strong>
+        <strong style="color: #38bdf8; cursor: pointer;" onclick="viewAssetDetails(${a.id})" title="Click to view full profile & repair history">${a.end_user}</strong>
       </td>
       <td>
         <span style="font-size: 0.82rem; color: var(--text-secondary);">${a.device}</span>
@@ -231,13 +252,8 @@ function renderAssetsTable(assets) {
       <td>
         <span class="badge-pill" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">${a.office}</span>
       </td>
-      <td>
-        <button class="btn btn-secondary btn-sm" onclick="viewAssetDetails(${a.id})" title="View Repair History">
-          📜 ${a.total_repairs} repair${a.total_repairs === 1 ? '' : 's'}
-        </button>
-      </td>
-      <td>
-        <div style="display: flex; gap: 6px;">
+      <td style="text-align: center; white-space: nowrap;">
+        <div class="action-btns-group">
           <button class="btn btn-secondary btn-sm" onclick="viewAssetDetails(${a.id})" title="Profile & Repair History">🔍</button>
           <button class="btn btn-secondary btn-sm" onclick="openEditAssetModal(${a.id})" title="Edit Details">✏️</button>
           <button class="btn btn-primary btn-sm" onclick="openNewJobSheetForAsset(${a.id})" title="File Official Job Sheet">🛠️</button>
@@ -738,35 +754,55 @@ async function openPrintableJobSheet(jobId) {
   }
 }
 
-// Trigger print
-function printCurrentSheet() {
-  window.print();
+// Safe string helper
+function safeStr(val) {
+  return (val === null || val === undefined) ? "" : String(val).toLowerCase();
 }
 
 // Global Filter Helper
 function filterDataGlobally(query) {
-  if (!query) {
+  const q = safeStr(query).trim();
+
+  if (!q) {
     renderAssetsTable(currentAssets);
     renderJobsTable(currentJobs);
+    renderTimeline(currentJobs);
     return;
   }
+
+  // Filter Assets across all spreadsheet & specs fields
   const filteredAssets = currentAssets.filter(a => 
-    a.end_user.toLowerCase().includes(query) ||
-    a.serial_number.toLowerCase().includes(query) ||
-    a.brand_model.toLowerCase().includes(query) ||
-    (a.computer_name && a.computer_name.toLowerCase().includes(query)) ||
-    a.office.toLowerCase().includes(query)
+    safeStr(a.end_user).includes(q) ||
+    safeStr(a.serial_number).includes(q) ||
+    safeStr(a.brand_model).includes(q) ||
+    safeStr(a.computer_name).includes(q) ||
+    safeStr(a.monitor_serial).includes(q) ||
+    safeStr(a.ups_serial).includes(q) ||
+    safeStr(a.office).includes(q) ||
+    safeStr(a.device).includes(q) ||
+    safeStr(a.processor).includes(q) ||
+    safeStr(a.status).includes(q) ||
+    safeStr(a.notes).includes(q)
   );
   renderAssetsTable(filteredAssets);
 
+  // Filter Jobs across all DPWH job sheet fields
   const filteredJobs = currentJobs.filter(j => 
-    j.ref_no.toLowerCase().includes(query) ||
-    j.full_name.toLowerCase().includes(query) ||
-    j.incident_description.toLowerCase().includes(query) ||
-    (j.hardware_serial_number && j.hardware_serial_number.toLowerCase().includes(query)) ||
-    (j.fulfilled_by && j.fulfilled_by.toLowerCase().includes(query))
+    safeStr(j.ref_no).includes(q) ||
+    safeStr(j.full_name).includes(q) ||
+    safeStr(j.section_division).includes(q) ||
+    safeStr(j.incident_description).includes(q) ||
+    safeStr(j.hardware_serial_number).includes(q) ||
+    safeStr(j.hardware_brand_model).includes(q) ||
+    safeStr(j.hardware_computer_name).includes(q) ||
+    safeStr(j.fulfilled_by).includes(q) ||
+    safeStr(j.status).includes(q) ||
+    safeStr(j.priority).includes(q) ||
+    safeStr(j.assessment).includes(q) ||
+    safeStr(j.actions_taken).includes(q)
   );
   renderJobsTable(filteredJobs);
+  renderTimeline(filteredJobs);
 }
 
 // Status badge CSS classes

@@ -24,7 +24,7 @@
     <ul class="nav-links">
       <li class="nav-item active" data-view="dashboard">
         <button id="navDashboardBtn">
-          <span class="nav-icon">📊</span> Operations Dashboard
+          <span class="nav-icon">📊</span> Dashboard
         </button>
       </li>
       <li class="nav-item" data-view="inventory">
@@ -34,7 +34,7 @@
       </li>
       <li class="nav-item" data-view="jobs">
         <button id="navJobsBtn">
-          <span class="nav-icon">🛠️</span> Job Sheets & Maintenance
+          <span class="nav-icon">🛠️</span> Job Sheet Form
         </button>
       </li>
       <li class="nav-item" data-view="history">
@@ -79,7 +79,7 @@
       <section id="dashboardView" class="portal-view active">
         <div class="view-header">
           <div>
-            <h2>ICT Operations & Inventory Dashboard</h2>
+            <h2>Dashboard</h2>
             <p>Davao de Oro 1st District Engineering Office &bull; ICT Support Section</p>
           </div>
         </div>
@@ -132,7 +132,7 @@
           <!-- Recent Repairs Panel -->
           <div class="card-panel">
             <div class="panel-header">
-              <h3><span>📋</span> Recent Service Job Sheets</h3>
+              <h3><span>📋</span> Recent Job Sheets</h3>
               <button class="btn btn-secondary btn-sm" onclick="switchView('jobs')">View All</button>
             </div>
             <div class="panel-body" id="recentJobsList">
@@ -204,7 +204,7 @@
           </div>
         </div>
 
-        <!-- Assets Table matching Excel Columns -->
+        <!-- Assets Table matching Excel Columns (Without redundant repair column) -->
         <div class="table-responsive">
           <table class="data-table">
             <thead>
@@ -217,8 +217,7 @@
                 <th>MONITOR with S/N</th>
                 <th>UPS with S/N</th>
                 <th>OFFICE</th>
-                <th>REPAIR HISTORY</th>
-                <th>ACTIONS</th>
+                <th style="width: 130px; text-align: center;">ACTIONS</th>
               </tr>
             </thead>
             <tbody id="assetTableBody">
@@ -232,7 +231,7 @@
       <section id="jobsView" class="portal-view">
         <div class="view-header">
           <div>
-            <h2>Official Job Sheet Service Requests</h2>
+            <h2>Job Sheet Form</h2>
             <p>Client requests, technical assessments, actions taken, and official DPWH sign-off forms.</p>
           </div>
           <button class="btn btn-primary" onclick="openNewJobSheetModal()">
