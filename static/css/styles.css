@@ -618,13 +618,14 @@ body {
   left: 0;
   right: 0;
   bottom: 0;
-  background: rgba(5, 10, 20, 0.75);
+  background: rgba(5, 10, 20, 0.8);
   backdrop-filter: blur(8px);
   display: none;
   align-items: center;
   justify-content: center;
   z-index: 100;
   padding: 20px;
+  overflow-y: auto;
 }
 
 .modal-overlay.active {
@@ -638,24 +639,37 @@ body {
   border-radius: var(--radius-xl);
   width: 100%;
   max-width: 780px;
-  max-height: 90vh;
+  max-height: 88vh;
+  height: auto;
   display: flex;
   flex-direction: column;
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
   overflow: hidden;
+  position: relative;
 }
 
 .modal-box.modal-lg {
   max-width: 900px;
 }
 
+/* Ensure form inside modal-box flexes properly so modal-body can scroll */
+.modal-box form {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
 .modal-header {
-  padding: 18px 24px;
+  padding: 16px 24px;
   border-bottom: 1px solid var(--border-color);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.85);
+  flex-shrink: 0;
 }
 
 .modal-header h3 {
@@ -683,18 +697,39 @@ body {
 
 .modal-body {
   padding: 24px;
-  overflow-y: auto;
-  flex: 1;
+  overflow-y: auto !important;
+  overflow-x: hidden;
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: calc(88vh - 130px);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Visible sleek scrollbar for modal content */
+.modal-body::-webkit-scrollbar {
+  width: 8px;
+}
+.modal-body::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.5);
+  border-radius: 4px;
+}
+.modal-body::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.35);
+  border-radius: 4px;
+}
+.modal-body::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.7);
 }
 
 .modal-footer {
-  padding: 16px 24px;
+  padding: 14px 24px;
   border-top: 1px solid var(--border-color);
-  background: rgba(15, 23, 42, 0.6);
+  background: rgba(15, 23, 42, 0.85);
   display: flex;
   align-items: center;
   justify-content: flex-end;
   gap: 12px;
+  flex-shrink: 0;
 }
 
 /* Form Styles */
