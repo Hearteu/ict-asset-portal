@@ -300,7 +300,13 @@ def job_detail_api(request, job_id):
 
     elif request.method == "DELETE":
         ref = job.ref_no
+        asset = job.asset
         job.delete()
+        if asset:
+            active_jobs = asset.job_sheets.filter(status__in=["Open", "In Progress", "Waiting for Parts"]).count()
+            if active_jobs == 0 and asset.status == "Under Repair":
+                asset.status = "In Use"
+                asset.save()
         return JsonResponse({"message": f"Job Sheet {ref} was deleted."})
 
     return JsonResponse({"error": "Method not allowed"}, status=405)
@@ -312,20 +318,23 @@ def export_csv(request):
     END-USER | DEVICE | BRAND and MODEL | SERIAL NUMBER | COMPUTER NAME | MONITOR with SERIAL NUMBER | UPS with SERIAL NUMBER | OFFICE | REPAIR HISTORY
     """
     assets = Asset.objects.all().order_by('end_user', 'serial_number')
-    response = HttpResponse(content_type='text/csv')
+    response = HttpResponse(content_type='text/csv; charset=utf-8-sig')
     response['Content-Disposition'] = 'attachment; filename="ICT_Computer_Inventory.csv"'
+
+    # UTF-8 BOM ensures Excel and spreadsheet editors properly interpret UTF-8 bold glyphs
+    response.write('\ufeff')
 
     writer = csv.writer(response)
     writer.writerow([
-        "END-USER",
-        "DEVICE",
-        "BRAND and MODEL",
-        "SERIAL NUMBER",
-        "COMPUTER NAME",
-        "MONITOR with SERIAL NUMBER",
-        "UPS with SERIAL NUMBER",
-        "OFFICE",
-        "REPAIR HISTORY"
+        "𝗘𝗡𝗗-𝗨𝗦𝗘𝗥",
+        "𝗗𝗘𝗩𝗜𝗖𝗘",
+        "𝗕𝗥𝗔𝗡𝗗 𝗮𝗻𝗱 𝗠𝗢𝗗𝗘𝗟",
+        "𝗦𝗘𝗥𝗜𝗔𝗟 𝗡𝗨𝗠𝗕𝗘𝗥",
+        "𝗖𝗢𝗠𝗣𝗨𝗧𝗘𝗥 𝗡𝗔𝗠𝗘",
+        "𝗠𝗢𝗡𝗜𝗧𝗢𝗥 𝘄𝗶𝘁𝗵 𝗦𝗘𝗥𝗜𝗔𝗟 𝗡𝗨𝗠𝗕𝗘𝗥",
+        "𝗨𝗣𝗦 𝘄𝗶𝘁𝗵 𝗦𝗘𝗥𝗜𝗔𝗟 𝗡𝗨𝗠𝗕𝗘𝗥",
+        "𝗢𝗙𝗙𝗜𝗖𝗘",
+        "𝗥𝗘𝗣𝗔𝗜𝗥 𝗛𝗜𝗦𝗧𝗢𝗥𝗬"
     ])
 
     for a in assets:

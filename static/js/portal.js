@@ -23,7 +23,7 @@ function showToast(message, type = "info") {
   let icon = "ℹ️";
   if (type === "success") icon = "✅";
   if (type === "error") icon = "⚠️";
-  
+
   toast.innerHTML = `<span>${icon}</span><span>${message}</span>`;
   container.appendChild(toast);
   setTimeout(() => {
@@ -100,7 +100,7 @@ function setupEventListeners() {
     filterDataGlobally(val);
   });
   document.getElementById("jobStatusFilter")?.addEventListener("change", loadJobs);
-  document.getElementById("jobPriorityFilter")?.addEventListener("change", loadJobs);
+  document.getElementById("confirmDeleteJobBtn")?.addEventListener("click", confirmDeleteJobSheet);
 
   // History Filter
   const historySearch = document.getElementById("historySearchInput");
@@ -270,7 +270,7 @@ function populateAssetSelect(assets) {
   const currentVal = select.value;
   select.innerHTML = `<option value="">-- Select Computer (End-User / Serial No.) --</option>` +
     assets.map(a => `<option value="${a.id}">${a.end_user} | ${a.brand_model} (${a.serial_number}) - ${a.office}</option>`).join("");
-  
+
   if (currentVal) select.value = currentVal;
 }
 
@@ -307,12 +307,10 @@ function updateJobSheetAssetPreview(assetId) {
 async function loadJobs() {
   try {
     const status = document.getElementById("jobStatusFilter")?.value || "";
-    const priority = document.getElementById("jobPriorityFilter")?.value || "";
     const search = document.getElementById("jobSearchInput")?.value || "";
 
     const params = new URLSearchParams();
     if (status) params.append("status", status);
-    if (priority) params.append("priority", priority);
     if (search) params.append("search", search);
 
     const res = await fetch(`/api/jobs/?${params.toString()}`);
@@ -355,9 +353,6 @@ function renderJobsTable(jobs) {
       </td>
       <td>
         <span class="status-badge ${getStatusClass(j.status)}">${j.status}</span>
-        <div style="margin-top: 3px;">
-          <span class="priority-badge priority-${j.priority}">${j.priority}</span>
-        </div>
       </td>
       <td>
         <div style="font-size: 0.84rem;">${j.fulfilled_by || 'Unassigned'}</div>
@@ -366,9 +361,11 @@ function renderJobsTable(jobs) {
         <div style="font-size: 0.78rem; color: var(--text-secondary);">${j.date_of_filing || ''}</div>
       </td>
       <td>
-        <div style="display: flex; gap: 6px;">
-          <button class="btn btn-secondary btn-sm" onclick="openEditJobSheetModal(${j.id})" title="Update Assessment & Actions">✏️</button>
-          <button class="btn btn-primary btn-sm" onclick="openPrintableJobSheet(${j.id})" title="Print Official DPWH Job Sheet Form">🖨️ Print</button>
+        <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
+          ${getNextStatusActionHtml(j)}
+          <button class="btn btn-secondary btn-sm btn-icon-only" onclick="openEditJobSheetModal(${j.id})" title="Edit Job Sheet">✏️</button>
+          <button class="btn btn-primary btn-sm btn-icon-only" onclick="openPrintableJobSheet(${j.id})" title="Print Official DPWH Job Sheet Form">🖨️</button>
+          <button class="btn btn-danger btn-sm btn-icon-only" onclick="promptDeleteJobSheet(${j.id}, '${(j.ref_no || '').replace(/'/g, "\\'")}')" title="Delete Job Sheet">🗑️</button>
         </div>
       </td>
     </tr>
@@ -577,6 +574,8 @@ function openNewJobSheetModal() {
   document.getElementById("jobDateReceived").value = `${new Date().toISOString().split("T")[0]} 08:30 AM`;
   document.getElementById("jobSection").value = "ODE-ICTS";
   document.getElementById("jobAssetPreviewCard").style.display = "none";
+  const delBtn = document.getElementById("btnDeleteJobSheetModal");
+  if (delBtn) delBtn.style.display = "none";
   document.getElementById("jobSheetModal").classList.add("active");
 }
 
@@ -596,6 +595,8 @@ async function openEditJobSheetModal(jobId) {
     const j = await res.json();
 
     document.getElementById("jobSheetModalTitle").textContent = `Update Job Sheet: Ref #${j.ref_no}`;
+    const delBtn = document.getElementById("btnDeleteJobSheetModal");
+    if (delBtn) delBtn.style.display = "inline-flex";
     document.getElementById("jobAssetSelect").value = j.asset_id;
     updateJobSheetAssetPreview(j.asset_id);
 
@@ -613,7 +614,6 @@ async function openEditJobSheetModal(jobId) {
     document.getElementById("jobDiagnosisInput").value = j.assessment || "";
     document.getElementById("jobActionInput").value = j.actions_taken || "";
     document.getElementById("jobModeFiling").value = j.mode_of_filing || "Walk-in";
-    document.getElementById("jobPrioritySelect").value = j.priority || "Medium";
     document.getElementById("jobStatusSelect").value = j.status || "Open";
 
     document.getElementById("jobDateReceived").value = j.date_time_received || "";
@@ -649,7 +649,7 @@ async function handleJobSheetFormSubmit(e) {
     assessment: document.getElementById("jobDiagnosisInput").value.trim(),
     actions_taken: document.getElementById("jobActionInput").value.trim(),
     mode_of_filing: document.getElementById("jobModeFiling").value,
-    priority: document.getElementById("jobPrioritySelect").value,
+    priority: "Medium",
     status: document.getElementById("jobStatusSelect").value,
 
     date_time_received: document.getElementById("jobDateReceived").value.trim(),
@@ -688,6 +688,108 @@ async function handleJobSheetFormSubmit(e) {
   }
 }
 
+// Next Status Quick Action Helper (Open -> In Progress -> Resolved -> Closed)
+function getNextStatusActionHtml(j) {
+  const safeRef = (j.ref_no || '').replace(/'/g, "\\'");
+  switch (j.status) {
+    case "Open":
+      return `<button class="btn btn-cyan btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'In Progress', '${safeRef}')" title="Start working on ticket — advance to In Progress">▶️ In Progress</button>`;
+    case "In Progress":
+      return `<button class="btn btn-accent btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'Resolved', '${safeRef}')" title="Mark repair as Resolved">✅ Resolve</button>`;
+    case "Resolved":
+      return `<button class="btn btn-secondary btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'Closed', '${safeRef}')" title="Client signed off — close ticket">🔒 Close</button>`;
+    case "Closed":
+      return `<button class="btn btn-secondary btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'Open', '${safeRef}')" title="Reopen this job sheet" style="opacity: 0.75;">🔄 Reopen</button>`;
+    default:
+      return '';
+  }
+}
+
+// Quick 1-Click Status Transition
+async function quickUpdateJobStatus(jobId, newStatus, refNo) {
+  try {
+    const payload = { status: newStatus };
+    if (newStatus === "Resolved" || newStatus === "Closed") {
+      payload.update_asset_status = "In Use";
+    } else if (newStatus === "In Progress" || newStatus === "Open") {
+      payload.update_asset_status = "Under Repair";
+    }
+
+    const res = await fetch(`/api/jobs/${jobId}/`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      showToast(err.error || "Failed to update status", "error");
+      return;
+    }
+
+    showToast(`Job Ref #${refNo || jobId} status updated to "${newStatus}"`, "success");
+    await loadJobs();
+    await loadAssets();
+    await loadStats();
+    await loadRepairHistory();
+  } catch (err) {
+    console.error("quickUpdateJobStatus error:", err);
+    showToast("Network error updating status", "error");
+  }
+}
+
+// Delete Job Sheet Modal Logic
+let pendingDeleteJobId = null;
+let pendingDeleteJobRef = null;
+
+function promptDeleteJobSheet(jobId, refNo) {
+  pendingDeleteJobId = jobId;
+  pendingDeleteJobRef = refNo;
+  const refElem = document.getElementById("deleteJobRefNo");
+  if (refElem) refElem.textContent = refNo ? `#${refNo}` : "";
+  document.getElementById("deleteJobModal")?.classList.add("active");
+}
+
+async function confirmDeleteJobSheet() {
+  if (!pendingDeleteJobId) return;
+  const id = pendingDeleteJobId;
+  const ref = pendingDeleteJobRef;
+  closeAllModals();
+
+  try {
+    const res = await fetch(`/api/jobs/${id}/`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      showToast(err.error || "Failed to delete job sheet", "error");
+      return;
+    }
+
+    showToast(`Job Sheet ${ref ? 'Ref #' + ref : ''} deleted successfully`, "success");
+    await loadJobs();
+    await loadAssets();
+    await loadStats();
+    await loadRepairHistory();
+  } catch (err) {
+    console.error("confirmDeleteJobSheet error:", err);
+    showToast("Network error deleting job sheet", "error");
+  } finally {
+    pendingDeleteJobId = null;
+    pendingDeleteJobRef = null;
+  }
+}
+
+function deleteCurrentEditingJobSheet() {
+  if (!editingJobId) return;
+  const title = document.getElementById("jobSheetModalTitle")?.textContent || "";
+  const refNo = title.replace("Update Job Sheet: Ref #", "").trim();
+  const id = editingJobId;
+  closeAllModals();
+  promptDeleteJobSheet(id, refNo);
+}
+
 // Official DPWH Job Sheet Form Print Preview
 async function openPrintableJobSheet(jobId) {
   try {
@@ -699,7 +801,7 @@ async function openPrintableJobSheet(jobId) {
     if (refNoElem) {
       refNoElem.textContent = "";
     }
-    
+
     // Client Info
     document.getElementById("printClientName").textContent = j.full_name || "";
     document.getElementById("printSection").textContent = j.section_division || "ODE-ICTS";
@@ -791,7 +893,7 @@ function filterDataGlobally(query) {
   }
 
   // Filter Assets across all spreadsheet & specs fields
-  const filteredAssets = currentAssets.filter(a => 
+  const filteredAssets = currentAssets.filter(a =>
     safeStr(a.end_user).includes(q) ||
     safeStr(a.serial_number).includes(q) ||
     safeStr(a.brand_model).includes(q) ||
@@ -807,7 +909,7 @@ function filterDataGlobally(query) {
   renderAssetsTable(filteredAssets);
 
   // Filter Jobs across all DPWH job sheet fields
-  const filteredJobs = currentJobs.filter(j => 
+  const filteredJobs = currentJobs.filter(j =>
     safeStr(j.ref_no).includes(q) ||
     safeStr(j.full_name).includes(q) ||
     safeStr(j.section_division).includes(q) ||
@@ -831,8 +933,7 @@ function getStatusClass(status) {
     case "In Use": return "status-in-use";
     case "Available / Spare": return "status-spare";
     case "Under Repair":
-    case "In Progress":
-    case "Waiting for Parts": return "status-repair";
+    case "In Progress": return "status-repair";
     case "Decommissioned": return "status-decommissioned";
     case "Resolved":
     case "Closed": return "status-in-use";

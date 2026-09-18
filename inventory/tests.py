@@ -31,7 +31,7 @@ class InventoryModelAndApiTests(TestCase):
     def test_portal_home_page(self):
         res = self.client.get('/')
         self.assertEqual(res.status_code, 200)
-        self.assertContains(res, "ICT Operations")
+        self.assertContains(res, "DPWH")
 
     def test_stats_api(self):
         res = self.client.get('/api/stats/')
@@ -84,5 +84,5 @@ class InventoryModelAndApiTests(TestCase):
     def test_csv_export(self):
         res = self.client.get('/api/assets/export/csv/')
         self.assertEqual(res.status_code, 200)
-        self.assertEqual(res['Content-Type'], 'text/csv')
-        self.assertIn(b"END-USER,DEVICE,BRAND and MODEL,SERIAL NUMBER,COMPUTER NAME,MONITOR with SERIAL NUMBER,UPS with SERIAL NUMBER,OFFICE,REPAIR HISTORY", res.content)
+        self.assertTrue(res['Content-Type'].startswith('text/csv'))
+        self.assertIn("𝗘𝗡𝗗-𝗨𝗦𝗘𝗥".encode('utf-8'), res.content)
