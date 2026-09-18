@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/styles.css">
+  <link rel="stylesheet" href="/static/css/styles.css?v=5.0">
 </head>
 <body>
 
@@ -60,7 +60,7 @@
       </div>
 
       <div class="topbar-actions">
-        <a href="/api/assets/export/csv/" class="btn btn-secondary" title="Export Inventory Sheet to Excel/CSV">
+        <a href="/api/assets/export/csv/" class="btn btn-secondary" title="Export Inventory Sheet to Excel/CSV" style="text-decoration: none !important;">
           📥 Export Inventory (CSV)
         </a>
       </div>
@@ -624,169 +624,229 @@
         
         <!-- Official DPWH Document Replica -->
         <div class="dpwh-sheet">
+          <!-- Top Header -->
           <div class="dpwh-top-header">
-            <div class="dpwh-logo-col">
-              <div class="dpwh-logo-circle">
-                DPWH<br>RO XI
+            <div class="dpwh-header-left">
+              <div class="dpwh-logo-col">
+                <img src="/static/img/dpwh_seal.svg" class="dpwh-official-seal" alt="DPWH Seal" width="75" height="75">
               </div>
-            </div>
-            <div class="dpwh-title-col">
-              <div class="dpwh-rep">Republic of the Philippines</div>
-              <div class="dpwh-dept">DEPARTMENT OF PUBLIC WORKS AND HIGHWAYS</div>
-              <div class="dpwh-reg">REGIONAL OFFICE NO. XI</div>
-              <div class="dpwh-office">Davao de Oro 1st District Engineering Office</div>
-              <div class="dpwh-address">Purok-18, Humabon St., Poblacion, Nabunturan, Davao de Oro</div>
+              <div class="dpwh-title-col">
+                <div class="dpwh-rep">Republic of the Philippines</div>
+                <div class="dpwh-dept">DEPARTMENT OF PUBLIC WORKS AND HIGHWAYS</div>
+                <div class="dpwh-reg">REGIONAL OFFICE NO. XI</div>
+                <div class="dpwh-office">Davao de Oro 1st District Engineering Office</div>
+                <div class="dpwh-address">Purok-18, Humabon St,. Poblacion, Nabunturan, Davao de Oro</div>
+              </div>
             </div>
             <div class="dpwh-ref-col">
               <div class="dpwh-form-title">JOB SHEET FORM</div>
-              <div class="dpwh-ref-box">
-                Ref. No.: <span id="printJobNo">2026-09-001</span>
+              <div class="dpwh-ref-container">
+                <div class="dpwh-ref-row">
+                  <span class="dpwh-ref-label">Ref. No.:</span>
+                  <div class="dpwh-ref-line" id="printJobNo"></div>
+                </div>
+                <div class="dpwh-ref-hint">(YYYY-MM-NNN)</div>
               </div>
             </div>
           </div>
 
           <!-- Section 1: Client Information -->
-          <div class="dpwh-section-header">CLIENT'S INFORMATION and SERVICE REQUEST</div>
-          <table class="dpwh-form-table">
-            <tr>
-              <td class="dpwh-label">Full Name:</td>
-              <td class="dpwh-val" id="printClientName" style="width: 45%;">-</td>
-              <td class="dpwh-label">Date of Filing:</td>
-              <td class="dpwh-val" id="printDateFiling">-</td>
-            </tr>
-            <tr>
-              <td class="dpwh-label">Section/Division:</td>
-              <td class="dpwh-val" id="printSection">-</td>
-              <td class="dpwh-label">Contact No.:</td>
-              <td class="dpwh-val" id="printContact">-</td>
-            </tr>
-            <tr>
-              <td colspan="4">
-                <strong>Brief description of the Incident or Request:</strong>
-                <div class="dpwh-lines-box" id="printIncident">-</div>
-              </td>
-            </tr>
-          </table>
-          <div class="dpwh-sig-row">
-            <div class="dpwh-sig-block">
-              <strong id="printClientSigName">Client's Signature</strong><br>
-              Client's Signature over Printed Name
+          <div class="dpwh-section-banner">CLIENT'S INFORMATION and SERVICE REQUEST</div>
+          <div class="dpwh-section-content dpwh-client-section-content">
+            <div class="dpwh-row">
+              <div class="dpwh-field-left">
+                <span class="dpwh-label dpwh-lbl-client-l">Full Name:</span>
+                <div class="dpwh-line-field" id="printClientName">-</div>
+              </div>
+              <div class="dpwh-field-right-client">
+                <span class="dpwh-label dpwh-lbl-client-r">Date of Filing:</span>
+                <div class="dpwh-line-field dpwh-field-short-client" id="printDateFiling">-</div>
+              </div>
+            </div>
+            <div class="dpwh-row">
+              <div class="dpwh-field-left">
+                <span class="dpwh-label dpwh-lbl-client-l">Section/Division:</span>
+                <div class="dpwh-line-field" id="printSection">-</div>
+              </div>
+              <div class="dpwh-field-right-client">
+                <span class="dpwh-label dpwh-lbl-client-r">Contact No.:</span>
+                <div class="dpwh-line-field dpwh-field-short-client" id="printContact">-</div>
+              </div>
+            </div>
+            <div class="dpwh-incident-sig-container">
+              <div class="dpwh-incident-left">
+                <div class="dpwh-label-block">Brief description of the Incident or Request:</div>
+                <div class="dpwh-ruled-box dpwh-ruled-5" id="printIncident">-</div>
+              </div>
+              <div class="dpwh-sig-right">
+                <div class="dpwh-sig-line"></div>
+                <div class="dpwh-sig-label">Client's Signature</div>
+              </div>
             </div>
           </div>
 
           <!-- Section 2: Technical Assessment -->
-          <div class="dpwh-section-header">I.T. SUPPORT TECHNICAL ASSESSMENT</div>
-          
-          <div class="dpwh-sub-header">Hardware</div>
-          <table class="dpwh-form-table">
-            <tr>
-              <td class="dpwh-label">Type:</td>
-              <td class="dpwh-val" id="printHwType" style="width: 35%;">-</td>
-              <td class="dpwh-label">Serial Number:</td>
-              <td class="dpwh-val" id="printHwSerial">-</td>
-            </tr>
-            <tr>
-              <td class="dpwh-label">Brand and Model:</td>
-              <td class="dpwh-val" id="printHwBrand">-</td>
-              <td class="dpwh-label">Computer Name:</td>
-              <td class="dpwh-val" id="printHwCompName">-</td>
-            </tr>
-          </table>
+          <div class="dpwh-section-banner">I.T. SUPPORT TECHNICAL ASSESSMENT</div>
+          <div class="dpwh-section-content dpwh-tech-content">
+            <!-- Hardware -->
+            <div class="dpwh-sub-block">
+              <div class="dpwh-sub-title">Hardware</div>
+              <div class="dpwh-row">
+                <div class="dpwh-field-left">
+                  <span class="dpwh-label dpwh-lbl-hw-l">Type</span>
+                  <div class="dpwh-line-field" id="printHwType">-</div>
+                </div>
+                <div class="dpwh-field-right-hw">
+                  <span class="dpwh-label dpwh-lbl-hw-r">Serial Number:</span>
+                  <div class="dpwh-line-field dpwh-field-short-hw" id="printHwSerial">-</div>
+                </div>
+              </div>
+              <div class="dpwh-row">
+                <div class="dpwh-field-left">
+                  <span class="dpwh-label dpwh-lbl-hw-l">Brand and Model</span>
+                  <div class="dpwh-line-field" id="printHwBrand">-</div>
+                </div>
+                <div class="dpwh-field-right-hw">
+                  <span class="dpwh-label dpwh-lbl-hw-r">Computer Name:</span>
+                  <div class="dpwh-line-field dpwh-field-short-hw" id="printHwCompName">-</div>
+                </div>
+              </div>
+            </div>
 
-          <div class="dpwh-sub-header">Application System / Software</div>
-          <table class="dpwh-form-table">
-            <tr>
-              <td class="dpwh-label">Description:</td>
-              <td class="dpwh-val" id="printAppDesc" style="width: 65%;">-</td>
-              <td class="dpwh-label">Version:</td>
-              <td class="dpwh-val" id="printAppVer">-</td>
-            </tr>
-          </table>
+            <!-- Application System / Software (2 lines for description) -->
+            <div class="dpwh-sub-block">
+              <div class="dpwh-sub-title">Application System / Software</div>
+              <div class="dpwh-app-row">
+                <div class="dpwh-app-desc-col">
+                  <span class="dpwh-label dpwh-lbl-app-desc">Description:</span>
+                  <div class="dpwh-ruled-box dpwh-ruled-2" id="printAppDesc">-</div>
+                </div>
+                <div class="dpwh-app-ver-col">
+                  <span class="dpwh-label dpwh-lbl-app-ver">Version:</span>
+                  <div class="dpwh-line-field dpwh-field-short-ver" id="printAppVer">-</div>
+                </div>
+              </div>
+            </div>
 
-          <div class="dpwh-sub-header">Connectivity</div>
-          <table class="dpwh-form-table">
-            <tr>
-              <td class="dpwh-label">Description:</td>
-              <td class="dpwh-val" id="printConnDesc" colspan="3">-</td>
-            </tr>
-          </table>
+            <!-- Connectivity (2 lines for description) -->
+            <div class="dpwh-sub-block">
+              <div class="dpwh-sub-title">Connectivity</div>
+              <div class="dpwh-two-line-row">
+                <span class="dpwh-label dpwh-lbl-app-desc">Description:</span>
+                <div class="dpwh-ruled-box dpwh-ruled-2" id="printConnDesc">-</div>
+              </div>
+            </div>
 
-          <div class="dpwh-sub-header">User Account</div>
-          <table class="dpwh-form-table">
-            <tr>
-              <td class="dpwh-label">Description:</td>
-              <td class="dpwh-val" id="printUserAcct" colspan="3">-</td>
-            </tr>
-          </table>
+            <!-- User Account (2 lines for description) -->
+            <div class="dpwh-sub-block">
+              <div class="dpwh-sub-title">User Account</div>
+              <div class="dpwh-two-line-row">
+                <span class="dpwh-label dpwh-lbl-app-desc">Description:</span>
+                <div class="dpwh-ruled-box dpwh-ruled-2" id="printUserAcct">-</div>
+              </div>
+            </div>
 
-          <div class="dpwh-sub-header">Assessment</div>
-          <div class="dpwh-lines-box" id="printAssessment">-</div>
+            <!-- Assessment (5 lines) -->
+            <div class="dpwh-sub-block">
+              <div class="dpwh-sub-title">Assessment</div>
+              <div class="dpwh-ruled-box dpwh-ruled-5" id="printAssessment">-</div>
+            </div>
 
-          <div class="dpwh-sub-header">Actions Taken and/or Recommendations</div>
-          <div class="dpwh-lines-box" id="printActionsTaken">-</div>
+            <!-- Actions Taken and/or Recommendations (5 lines) -->
+            <div class="dpwh-sub-block dpwh-actions-block">
+              <div class="dpwh-sub-title">Actions Taken and/or Recommendations</div>
+              <div class="dpwh-ruled-box dpwh-ruled-5" id="printActionsTaken">-</div>
+              <div class="dpwh-separate-sheet-note">(continue on a separate sheet if necessary)</div>
+            </div>
 
-          <table class="dpwh-form-table">
-            <tr>
-              <td style="width: 45%;">
-                <strong>Mode of Filing:</strong> &nbsp;
-                <span id="printModeWalkin">[ ] Walk-in</span> &nbsp;
-                <span id="printModePhone">[ ] Telephone Call</span> &nbsp;
-                <span id="printModeEmail">[ ] Email</span>
-                <div style="margin-top: 4px;">Date and Time Received: <strong id="printDateReceived">-</strong></div>
-                <div>Date and Time Completed: <strong id="printDateCompleted">-</strong></div>
-              </td>
-              <td>
-                <div style="margin-bottom: 24px;">Fulfilled by: <strong id="printFulfilledBy">-</strong></div>
-                <div style="font-size: 9px; border-top: 1px solid #000; padding-top: 2px; text-align: center;">Signature over Printed Name</div>
-              </td>
-              <td>
-                <div style="margin-bottom: 24px;">Reviewed by: <strong id="printReviewedBy">-</strong></div>
-                <div style="font-size: 9px; border-top: 1px solid #000; padding-top: 2px; text-align: center;">Signature over Printed Name</div>
-              </td>
-            </tr>
-          </table>
+            <!-- Mode of Filing & Tech Signatures -->
+            <div class="dpwh-filing-tech-grid">
+              <div class="dpwh-filing-col">
+                <div class="dpwh-mode-row">
+                  <span class="dpwh-label" style="margin-right: 6px;">Mode of Filing:</span>
+                  <span class="dpwh-checkbox" id="printModeWalkin"><span class="dpwh-box"></span> Walk-in</span>
+                  <span class="dpwh-checkbox" id="printModePhone"><span class="dpwh-box"></span> Telphone Call</span>
+                  <span class="dpwh-checkbox" id="printModeEmail"><span class="dpwh-box"></span> Email</span>
+                </div>
+                <div class="dpwh-time-row">
+                  <span class="dpwh-label dpwh-lbl-time">Date and Time Received:</span>
+                  <div class="dpwh-line-field dpwh-time-field" id="printDateReceived">-</div>
+                </div>
+                <div class="dpwh-time-row">
+                  <span class="dpwh-label dpwh-lbl-time">Date and Time Completed:</span>
+                  <div class="dpwh-line-field dpwh-time-field" id="printDateCompleted">-</div>
+                </div>
+              </div>
+              <div class="dpwh-tech-col">
+                <div class="dpwh-sign-row">
+                  <span class="dpwh-label dpwh-lbl-sign">Fulfilled by:</span>
+                  <div class="dpwh-sig-block">
+                    <div class="dpwh-sig-name" id="printFulfilledBy">-</div>
+                    <div class="dpwh-sig-line"></div>
+                    <div class="dpwh-sig-sub">Signature over Printed Name</div>
+                  </div>
+                </div>
+                <div class="dpwh-sign-row">
+                  <span class="dpwh-label dpwh-lbl-sign">Reviewed by:</span>
+                  <div class="dpwh-sig-block">
+                    <div class="dpwh-sig-name" id="printReviewedBy">-</div>
+                    <div class="dpwh-sig-line"></div>
+                    <div class="dpwh-sig-sub">Signature over Printed Name</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
 
           <!-- Section 3: Client Evaluation -->
-          <div class="dpwh-section-header">CLIENT'S EVALUATION</div>
-          <div class="dpwh-eval-grid">
-            <div class="dpwh-eval-q">
-              <span>1. Was your concern/problem properly addressed?</span>
-              <div class="dpwh-checkbox-group">
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckYes"> </span> Yes</span>
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckNo"> </span> No</span>
+          <div class="dpwh-section-banner">CLIENT'S EVALUATION</div>
+          <div class="dpwh-section-content">
+            <div class="dpwh-eval-questions">
+              <div class="dpwh-eval-row">
+                <span class="dpwh-eval-q">1. Was your concern/problem properly addressed?</span>
+                <div class="dpwh-eval-options">
+                  <span class="dpwh-checkbox" id="evalCheckYes"><span class="dpwh-box"></span> Yes</span>
+                  <span class="dpwh-checkbox" id="evalCheckNo"><span class="dpwh-box"></span> No</span>
+                </div>
               </div>
-            </div>
-            <div class="dpwh-eval-q">
-              <span>2. How satisfied are you with the IT support/service you received?</span>
-              <div class="dpwh-checkbox-group">
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSupVery"> </span> Very Satisfied</span>
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSupSat"> </span> Satisfied</span>
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSupNot"> </span> Not Satisfied</span>
+              <div class="dpwh-eval-row">
+                <span class="dpwh-eval-q">2. How satisfied are you with the IT support/service you received?</span>
+                <div class="dpwh-eval-options">
+                  <span class="dpwh-checkbox" id="evalCheckSupVery"><span class="dpwh-box"></span> Very Satisfied</span>
+                  <span class="dpwh-checkbox" id="evalCheckSupSat"><span class="dpwh-box"></span> Satisfied</span>
+                  <span class="dpwh-checkbox" id="evalCheckSupNot"><span class="dpwh-box"></span> Not Satisfied</span>
+                </div>
               </div>
-            </div>
-            <div class="dpwh-eval-q">
-              <span>3. How satisfied are you with the effectiveness of the solution?</span>
-              <div class="dpwh-checkbox-group">
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSolVery"> </span> Very Satisfied</span>
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSolSat"> </span> Satisfied</span>
-                <span class="dpwh-checkbox"><span class="dpwh-checkbox-box" id="evalCheckSolNot"> </span> Not Satisfied</span>
+              <div class="dpwh-eval-row">
+                <span class="dpwh-eval-q">3. How satisfied are you with the effectiveness of the solution?</span>
+                <div class="dpwh-eval-options">
+                  <span class="dpwh-checkbox" id="evalCheckSolVery"><span class="dpwh-box"></span> Very Satisfied</span>
+                  <span class="dpwh-checkbox" id="evalCheckSolSat"><span class="dpwh-box"></span> Satisfied</span>
+                  <span class="dpwh-checkbox" id="evalCheckSolNot"><span class="dpwh-box"></span> Not Satisfied</span>
+                </div>
               </div>
             </div>
 
-            <div style="margin-top: 6px;">
-              <strong>Comments and/or Suggestions:</strong>
-              <div style="border-bottom: 1px dotted #666; min-height: 22px; padding: 2px 4px;" id="printComments">-</div>
-            </div>
-          </div>
-          <div class="dpwh-sig-row">
-            <div class="dpwh-sig-block">
-              <strong>Client's Signature</strong>
+            <div class="dpwh-comments-sig-container">
+              <div class="dpwh-comments-left">
+                <div class="dpwh-label-block">Comments and/or Suggestions:</div>
+                <div class="dpwh-ruled-box dpwh-ruled-4" id="printComments">-</div>
+              </div>
+              <div class="dpwh-sig-right">
+                <div class="dpwh-sig-line"></div>
+                <div class="dpwh-sig-label">Client's Signature</div>
+              </div>
             </div>
           </div>
 
+          <!-- Footer -->
           <div class="dpwh-footer">
-            <div>ICT Office Hotline No.: xxxxx &nbsp;|&nbsp; Email: sample_email@dpwh.gov.ph</div>
-            <div style="text-align: right;">Your one-stop-shop for IT issues and concerns!</div>
+            <div class="dpwh-footer-hotline">
+              ICT Office Hotline No.: <span class="dpwh-italic">xxxxx</span> Email: <span class="dpwh-italic">sample_email@dpwh.gov.ph</span>
+            </div>
+            <div class="dpwh-footer-motto">
+              Your one-stop-shop for IT issues and concerns!
+            </div>
           </div>
         </div>
 
@@ -801,6 +861,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="/static/js/portal.js"></script>
+  <script src="/static/js/portal.js?v=3.0"></script>
 </body>
 </html>

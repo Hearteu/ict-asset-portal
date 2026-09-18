@@ -694,65 +694,85 @@ async function openPrintableJobSheet(jobId) {
     const res = await fetch(`/api/jobs/${jobId}/`);
     const j = await res.json();
 
-    document.getElementById("printJobNo").textContent = j.ref_no || "2026-00-000";
+    // Ref. No. kept BLANK per official DPWH template format requirement
+    const refNoElem = document.getElementById("printJobNo");
+    if (refNoElem) {
+      refNoElem.textContent = "";
+    }
     
     // Client Info
-    document.getElementById("printClientName").textContent = j.full_name || "-";
+    document.getElementById("printClientName").textContent = j.full_name || "";
     document.getElementById("printSection").textContent = j.section_division || "ODE-ICTS";
-    document.getElementById("printDateFiling").textContent = j.date_of_filing || "-";
-    document.getElementById("printContact").textContent = j.contact_no || "-";
-    document.getElementById("printIncident").textContent = j.incident_description || "-";
-    document.getElementById("printClientSigName").textContent = j.full_name || "Client's Signature";
+    document.getElementById("printDateFiling").textContent = j.date_of_filing || "";
+    document.getElementById("printContact").textContent = j.contact_no || "";
+    document.getElementById("printIncident").textContent = j.incident_description || "";
 
     // Hardware
     document.getElementById("printHwType").textContent = j.hardware_type || "Desktop";
-    document.getElementById("printHwBrand").textContent = j.hardware_brand_model || "-";
-    document.getElementById("printHwSerial").textContent = j.hardware_serial_number || "-";
-    document.getElementById("printHwCompName").textContent = j.hardware_computer_name || "-";
+    document.getElementById("printHwBrand").textContent = j.hardware_brand_model || "";
+    document.getElementById("printHwSerial").textContent = j.hardware_serial_number || "";
+    document.getElementById("printHwCompName").textContent = j.hardware_computer_name || "";
 
     // Software & Network
-    document.getElementById("printAppDesc").textContent = j.app_software_description || "N/A";
-    document.getElementById("printAppVer").textContent = j.app_software_version || "-";
-    document.getElementById("printConnDesc").textContent = j.connectivity_description || "N/A";
-    document.getElementById("printUserAcct").textContent = j.user_account_description || "N/A";
+    document.getElementById("printAppDesc").textContent = j.app_software_description || "";
+    document.getElementById("printAppVer").textContent = j.app_software_version || "";
+    document.getElementById("printConnDesc").textContent = j.connectivity_description || "";
+    document.getElementById("printUserAcct").textContent = j.user_account_description || "";
 
     // Technical Assessment & Actions
-    document.getElementById("printAssessment").textContent = j.assessment || "Pending assessment.";
-    document.getElementById("printActionsTaken").textContent = j.actions_taken || "Pending action.";
+    document.getElementById("printAssessment").textContent = j.assessment || "";
+    document.getElementById("printActionsTaken").textContent = j.actions_taken || "";
 
     // Mode of Filing Checkboxes
     const mode = j.mode_of_filing || "Walk-in";
-    document.getElementById("printModeWalkin").innerHTML = mode === "Walk-in" ? "<strong>[X] Walk-in</strong>" : "[ ] Walk-in";
-    document.getElementById("printModePhone").innerHTML = mode === "Telephone Call" ? "<strong>[X] Telephone Call</strong>" : "[ ] Telephone Call";
-    document.getElementById("printModeEmail").innerHTML = mode === "Email" ? "<strong>[X] Email</strong>" : "[ ] Email";
+    const boxWalkin = document.querySelector("#printModeWalkin .dpwh-box");
+    const boxPhone = document.querySelector("#printModePhone .dpwh-box");
+    const boxEmail = document.querySelector("#printModeEmail .dpwh-box");
+    if (boxWalkin) boxWalkin.textContent = (mode === "Walk-in") ? "✓" : "";
+    if (boxPhone) boxPhone.textContent = (mode === "Telephone Call" || mode === "Telphone Call") ? "✓" : "";
+    if (boxEmail) boxEmail.textContent = (mode === "Email") ? "✓" : "";
 
-    document.getElementById("printDateReceived").textContent = j.date_time_received || "-";
-    document.getElementById("printDateCompleted").textContent = j.date_time_completed || "In Progress";
-    document.getElementById("printFulfilledBy").textContent = j.fulfilled_by || "ICT Support";
-    document.getElementById("printReviewedBy").textContent = j.reviewed_by || "Head, ICT Unit";
+    document.getElementById("printDateReceived").textContent = j.date_time_received || "";
+    document.getElementById("printDateCompleted").textContent = j.date_time_completed || "";
+    document.getElementById("printFulfilledBy").textContent = j.fulfilled_by || "";
+    document.getElementById("printReviewedBy").textContent = j.reviewed_by || "";
 
     // Evaluation checkboxes
     const addressed = j.concern_addressed || "";
-    document.getElementById("evalCheckYes").textContent = addressed === "Yes" ? "✓" : " ";
-    document.getElementById("evalCheckNo").textContent = addressed === "No" ? "✓" : " ";
+    const boxYes = document.querySelector("#evalCheckYes .dpwh-box");
+    const boxNo = document.querySelector("#evalCheckNo .dpwh-box");
+    if (boxYes) boxYes.textContent = (addressed === "Yes") ? "✓" : "";
+    if (boxNo) boxNo.textContent = (addressed === "No") ? "✓" : "";
 
     const sat = j.it_support_satisfaction || "";
-    document.getElementById("evalCheckSupVery").textContent = sat === "Very Satisfied" ? "✓" : " ";
-    document.getElementById("evalCheckSupSat").textContent = sat === "Satisfied" ? "✓" : " ";
-    document.getElementById("evalCheckSupNot").textContent = sat === "Not Satisfied" ? "✓" : " ";
+    const boxSupVery = document.querySelector("#evalCheckSupVery .dpwh-box");
+    const boxSupSat = document.querySelector("#evalCheckSupSat .dpwh-box");
+    const boxSupNot = document.querySelector("#evalCheckSupNot .dpwh-box");
+    if (boxSupVery) boxSupVery.textContent = (sat === "Very Satisfied") ? "✓" : "";
+    if (boxSupSat) boxSupSat.textContent = (sat === "Satisfied") ? "✓" : "";
+    if (boxSupNot) boxSupNot.textContent = (sat === "Not Satisfied") ? "✓" : "";
 
     const solSat = j.solution_satisfaction || sat;
-    document.getElementById("evalCheckSolVery").textContent = solSat === "Very Satisfied" ? "✓" : " ";
-    document.getElementById("evalCheckSolSat").textContent = solSat === "Satisfied" ? "✓" : " ";
-    document.getElementById("evalCheckSolNot").textContent = solSat === "Not Satisfied" ? "✓" : " ";
+    const boxSolVery = document.querySelector("#evalCheckSolVery .dpwh-box");
+    const boxSolSat = document.querySelector("#evalCheckSolSat .dpwh-box");
+    const boxSolNot = document.querySelector("#evalCheckSolNot .dpwh-box");
+    if (boxSolVery) boxSolVery.textContent = (solSat === "Very Satisfied") ? "✓" : "";
+    if (boxSolSat) boxSolSat.textContent = (solSat === "Satisfied") ? "✓" : "";
+    if (boxSolNot) boxSolNot.textContent = (solSat === "Not Satisfied") ? "✓" : "";
 
-    document.getElementById("printComments").textContent = j.comments_suggestions || "None";
+    document.getElementById("printComments").textContent = j.comments_suggestions || "";
 
     document.getElementById("printableJobSheetModal").classList.add("active");
   } catch (err) {
     showToast("Error preparing printable job sheet", "error");
   }
 }
+
+// Print Handler for Printable DPWH Job Sheet Form
+function printCurrentSheet() {
+  window.print();
+}
+window.printCurrentSheet = printCurrentSheet;
 
 // Safe string helper
 function safeStr(val) {
