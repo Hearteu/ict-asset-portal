@@ -51,10 +51,13 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'ict_portal_project.wsgi.application'
 
+DATA_DIR = BASE_DIR / 'data'
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'data' / 'ict_portal_django.db',
+        'NAME': DATA_DIR / 'ict_portal_django.db',
     }
 }
 

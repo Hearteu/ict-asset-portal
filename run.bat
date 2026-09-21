@@ -6,6 +6,9 @@ echo ========================================================
 echo  Starting ICT Asset Inventory and Job Sheet Portal...
 echo ========================================================
 
+:: Ensure data directory exists
+if not exist "data" mkdir "data"
+
 :: Check virtual environment
 if not exist "venv\Scripts\python.exe" (
     echo Creating virtual environment and installing dependencies...
@@ -14,6 +17,12 @@ if not exist "venv\Scripts\python.exe" (
     pip install -r requirements.txt
     python manage.py migrate
     python manage.py seed_data
+) else (
+    if not exist "data\ict_portal_django.db" (
+        echo Initializing database...
+        venv\Scripts\python.exe manage.py migrate
+        venv\Scripts\python.exe manage.py seed_data
+    )
 )
 
 :: Automatically open the portal in your default browser (Chrome, Edge, etc.)
