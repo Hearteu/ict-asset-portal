@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/styles.css?v=23.0">
+  <link rel="stylesheet" href="/static/css/styles.css?v=24.0">
 </head>
 <body>
 
@@ -203,7 +203,7 @@
                 <th>MONITOR with S/N</th>
                 <th>UPS with S/N</th>
                 <th>OFFICE</th>
-                <th style="width: 130px; text-align: center;">ACTIONS</th>
+                <th style="width: 155px; text-align: center;">ACTIONS</th>
               </tr>
             </thead>
             <tbody id="assetTableBody">
@@ -454,9 +454,12 @@
             </div>
           </div>
         </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save to Inventory</button>
+        <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center;">
+          <button type="button" class="btn btn-danger" id="btnDeleteAssetModal" style="display: none;" onclick="deleteCurrentEditingAsset()">🗑️ Delete Computer</button>
+          <div style="display: flex; gap: 10px; margin-left: auto;">
+            <button type="button" class="btn btn-secondary btn-close-modal">Cancel</button>
+            <button type="submit" class="btn btn-primary">Save to Inventory</button>
+          </div>
         </div>
       </form>
     </div>
@@ -1048,6 +1051,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="/static/js/portal.js?v=15.0"></script>
+  <script src="/static/js/portal.js?v=16.0"></script>
 </body>
 </html>

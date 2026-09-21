@@ -740,9 +740,10 @@ function renderAssetsTable(assets) {
       </td>
       <td style="text-align: center; white-space: nowrap;">
         <div class="action-btns-group">
-          <button class="btn btn-secondary btn-sm" onclick="viewAssetDetails(${a.id})" title="Profile & Repair History">🔍</button>
-          <button class="btn btn-secondary btn-sm" onclick="openEditAssetModal(${a.id})" title="Edit Details">✏️</button>
-          <button class="btn btn-primary btn-sm" onclick="openNewJobSheetForAsset(${a.id})" title="File Official Job Sheet">🛠️</button>
+          <button class="btn btn-secondary btn-sm btn-icon-only" onclick="viewAssetDetails(${a.id})" title="Profile & Repair History">🔍</button>
+          <button class="btn btn-secondary btn-sm btn-icon-only" onclick="openEditAssetModal(${a.id})" title="Edit Details">✏️</button>
+          <button class="btn btn-primary btn-sm btn-icon-only" onclick="openNewJobSheetForAsset(${a.id})" title="File Official Job Sheet">🛠️</button>
+          <button class="btn btn-danger btn-sm btn-icon-only" onclick="promptDeleteAsset(${a.id}, '${(a.end_user || '').replace(/'/g, "\\'")}', '${(a.serial_number || '').replace(/'/g, "\\'")}')" title="Delete Computer Asset">🗑️</button>
         </div>
       </td>
     </tr>
@@ -993,6 +994,8 @@ function openNewAssetModal() {
   document.getElementById("assetForm").reset();
   setCustomOfficeValue("ICT Staff");
   closeAllCustomDropdowns();
+  const delBtn = document.getElementById("btnDeleteAssetModal");
+  if (delBtn) delBtn.style.display = "none";
   document.getElementById("assetModal").classList.add("active");
 }
 
@@ -1019,6 +1022,9 @@ async function openEditAssetModal(assetId) {
     document.getElementById("assetRamInput").value = a.ram || "";
     document.getElementById("assetStorageInput").value = a.storage || "";
     document.getElementById("assetNotesInput").value = a.notes || "";
+
+    const delBtn = document.getElementById("btnDeleteAssetModal");
+    if (delBtn) delBtn.style.display = "inline-flex";
 
     document.getElementById("assetModal").classList.add("active");
   } catch (err) {
@@ -1401,26 +1407,50 @@ async function quickUpdateJobStatus(jobId, newStatus, refNo) {
   }
 }
 
-// Delete Job Sheet Modal Logic
-let pendingDeleteJobId = null;
-let pendingDeleteJobRef = null;
-
-function promptDeleteJobSheet(jobId, refNo) {
-  pendingDeleteJobId = jobId;
-  pendingDeleteJobRef = refNo;
-  const refElem = document.getElementById("deleteJobRefNo");
-  if (refElem) refElem.textContent = refNo ? `#${refNo}` : "";
-  document.getElementById("deleteJobModal")?.classList.add("active");
-}
-
-async function confirmDeleteJobSheet() {
-  if (!pendingDeleteJobId) return;
-  const id = pendingDeleteJobId;
-  const ref = pendingDeleteJobRef;
-  closeAllModals();
+// Computer Asset Deletion Logic
+async function promptDeleteAsset(assetId, endUser, serialNumber) {
+  const label = endUser ? `${endUser} (${serialNumber})` : serialNumber;
+  const confirmed = confirm(`Are you sure you want to delete this computer from inventory?\n\n${label}\n\nThis will permanently remove this machine and its history. This action cannot be undone.`);
+  if (!confirmed) return;
 
   try {
-    const res = await fetch(`/api/jobs/${id}/`, {
+    const res = await fetch(`/api/assets/${assetId}/`, {
+      method: "DELETE"
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      showToast(err.error || "Failed to delete computer", "error");
+      return;
+    }
+
+    showToast(`Computer (${serialNumber}) removed from inventory`, "success");
+    await loadAssets();
+    await loadStats();
+    await loadRepairHistory();
+  } catch (err) {
+    console.error("promptDeleteAsset error:", err);
+    showToast("Network error deleting computer", "error");
+  }
+}
+
+function deleteCurrentEditingAsset() {
+  if (!editingAssetId) return;
+  const owner = document.getElementById("assetOwnerInput")?.value || "";
+  const serial = document.getElementById("assetSerialInput")?.value || "";
+  const id = editingAssetId;
+  closeAllModals();
+  promptDeleteAsset(id, owner, serial);
+}
+
+// Delete Job Sheet Logic
+async function promptDeleteJobSheet(jobId, refNo) {
+  const label = refNo ? `#${refNo}` : `Ticket ID ${jobId}`;
+  const confirmed = confirm(`Are you sure you want to delete Job Sheet ${label}?\n\nThis action cannot be undone.`);
+  if (!confirmed) return;
+
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/`, {
       method: "DELETE"
     });
 
@@ -1430,17 +1460,14 @@ async function confirmDeleteJobSheet() {
       return;
     }
 
-    showToast(`Job Sheet ${ref ? 'Ref #' + ref : ''} deleted successfully`, "success");
+    showToast(`Job Sheet ${label} deleted successfully`, "success");
     await loadJobs();
     await loadAssets();
     await loadStats();
     await loadRepairHistory();
   } catch (err) {
-    console.error("confirmDeleteJobSheet error:", err);
+    console.error("promptDeleteJobSheet error:", err);
     showToast("Network error deleting job sheet", "error");
-  } finally {
-    pendingDeleteJobId = null;
-    pendingDeleteJobRef = null;
   }
 }
 
@@ -1613,7 +1640,8 @@ window.quickUpdateJobStatus = quickUpdateJobStatus;
 window.openNewJobSheetModal = openNewJobSheetModal;
 window.openEditJobSheetModal = openEditJobSheetModal;
 window.promptDeleteJobSheet = promptDeleteJobSheet;
-window.confirmDeleteJobSheet = confirmDeleteJobSheet;
 window.deleteCurrentEditingJobSheet = deleteCurrentEditingJobSheet;
+window.promptDeleteAsset = promptDeleteAsset;
+window.deleteCurrentEditingAsset = deleteCurrentEditingAsset;
 window.openPrintableJobSheet = openPrintableJobSheet;
 
