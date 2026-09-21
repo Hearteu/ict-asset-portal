@@ -113,10 +113,193 @@ function getOfficeInfo(office) {
   return { short: trimmed, full: trimmed };
 }
 
+// Custom Office Dropdown Controller (Anchored strictly below the field)
+function setupCustomOfficeDropdown() {
+  const wrapper = document.getElementById("customOfficeSelectWrapper");
+  const trigger = document.getElementById("customOfficeTrigger");
+  const searchInput = document.getElementById("customOfficeSearch");
+  const optionsContainer = document.getElementById("customOfficeOptions");
+  const selectElem = document.getElementById("assetDeptSelect");
+
+  if (!wrapper || !trigger || !optionsContainer || !selectElem) return;
+
+  // Render 19 options from selectElem with badges
+  renderCustomOfficeOptions();
+
+  // Toggle dropdown on trigger click
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = wrapper.classList.contains("open");
+    closeAllCustomDropdowns();
+    if (!isOpen) {
+      wrapper.classList.add("open");
+      trigger.setAttribute("aria-expanded", "true");
+      if (searchInput) {
+        searchInput.value = "";
+        filterCustomOfficeOptions("");
+        setTimeout(() => searchInput.focus(), 60);
+      }
+    }
+  });
+
+  // Handle keyboard on trigger
+  trigger.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+      e.preventDefault();
+      trigger.click();
+    }
+  });
+
+  // Filter search
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      filterCustomOfficeOptions(e.target.value);
+    });
+    searchInput.addEventListener("click", (e) => e.stopPropagation());
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeAllCustomDropdowns();
+        trigger.focus();
+      }
+    });
+  }
+
+  // Close on outside click
+  document.addEventListener("click", (e) => {
+    if (!wrapper.contains(e.target)) {
+      closeAllCustomDropdowns();
+    }
+  });
+
+  // Close on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && wrapper.classList.contains("open")) {
+      closeAllCustomDropdowns();
+      trigger.focus();
+    }
+  });
+}
+
+function renderCustomOfficeOptions() {
+  const optionsContainer = document.getElementById("customOfficeOptions");
+  const selectElem = document.getElementById("assetDeptSelect");
+  if (!optionsContainer || !selectElem) return;
+
+  const currentVal = selectElem.value || "ICT Staff";
+  const options = Array.from(selectElem.options);
+
+  optionsContainer.innerHTML = options.map(opt => {
+    const val = opt.value;
+    const off = getOfficeInfo(val);
+    const isSelected = (val === currentVal || off.short === currentVal || off.full === currentVal);
+    return `
+      <div class="custom-select-option ${isSelected ? 'selected' : ''}" data-value="${val}" role="option" aria-selected="${isSelected}">
+        <span>${off.full}</span>
+        <span class="option-badge">${off.short}</span>
+      </div>
+    `;
+  }).join("");
+
+  // Attach click listeners to options
+  optionsContainer.querySelectorAll(".custom-select-option").forEach(item => {
+    item.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const val = item.getAttribute("data-value");
+      setCustomOfficeValue(val);
+      closeAllCustomDropdowns();
+      const trigger = document.getElementById("customOfficeTrigger");
+      if (trigger) trigger.focus();
+    });
+  });
+}
+
+function filterCustomOfficeOptions(query) {
+  const optionsContainer = document.getElementById("customOfficeOptions");
+  if (!optionsContainer) return;
+
+  const q = query.trim().toLowerCase();
+  const optionItems = optionsContainer.querySelectorAll(".custom-select-option");
+  let visibleCount = 0;
+
+  optionItems.forEach(item => {
+    const val = item.getAttribute("data-value") || "";
+    const off = getOfficeInfo(val);
+    const matches = off.full.toLowerCase().includes(q) || off.short.toLowerCase().includes(q);
+    if (matches) {
+      item.style.display = "flex";
+      visibleCount++;
+    } else {
+      item.style.display = "none";
+    }
+  });
+
+  let noResults = optionsContainer.querySelector(".custom-select-no-results");
+  if (visibleCount === 0) {
+    if (!noResults) {
+      noResults = document.createElement("div");
+      noResults.className = "custom-select-no-results";
+      noResults.textContent = "No matching offices found";
+      optionsContainer.appendChild(noResults);
+    }
+    noResults.style.display = "block";
+  } else if (noResults) {
+    noResults.style.display = "none";
+  }
+}
+
+function setCustomOfficeValue(val) {
+  const selectElem = document.getElementById("assetDeptSelect");
+  const selectedTextElem = document.getElementById("customOfficeSelectedText");
+  const optionsContainer = document.getElementById("customOfficeOptions");
+
+  const off = getOfficeInfo(val);
+  const targetVal = off.full;
+
+  if (selectElem) {
+    let matched = false;
+    for (let opt of selectElem.options) {
+      if (opt.value === targetVal || opt.value === off.short || opt.value === val) {
+        selectElem.value = opt.value;
+        matched = true;
+        break;
+      }
+    }
+    if (!matched && targetVal) {
+      const newOpt = document.createElement("option");
+      newOpt.value = targetVal;
+      newOpt.textContent = targetVal;
+      selectElem.appendChild(newOpt);
+      selectElem.value = targetVal;
+    }
+  }
+
+  if (selectedTextElem) {
+    selectedTextElem.textContent = off.full;
+  }
+
+  if (optionsContainer) {
+    optionsContainer.querySelectorAll(".custom-select-option").forEach(item => {
+      const itemVal = item.getAttribute("data-value");
+      const isSelected = (itemVal === targetVal || itemVal === off.short || itemVal === val);
+      item.classList.toggle("selected", isSelected);
+      item.setAttribute("aria-selected", isSelected ? "true" : "false");
+    });
+  }
+}
+
+function closeAllCustomDropdowns() {
+  document.querySelectorAll(".custom-select-wrapper.open").forEach(w => {
+    w.classList.remove("open");
+    const trigger = w.querySelector(".custom-select-trigger");
+    if (trigger) trigger.setAttribute("aria-expanded", "false");
+  });
+}
+
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   setupNavigation();
   setupEventListeners();
+  setupCustomOfficeDropdown();
   loadAllData();
 });
 
@@ -608,8 +791,8 @@ function openNewAssetModal() {
   editingAssetId = null;
   document.getElementById("assetModalTitle").textContent = "Register Computer to Inventory";
   document.getElementById("assetForm").reset();
-  const deptSelect = document.getElementById("assetDeptSelect");
-  if (deptSelect) deptSelect.value = "ICT Staff";
+  setCustomOfficeValue("ICT Staff");
+  closeAllCustomDropdowns();
   document.getElementById("assetModal").classList.add("active");
 }
 
@@ -628,26 +811,8 @@ async function openEditAssetModal(assetId) {
     document.getElementById("assetMonitorInput").value = a.monitor_serial === '-' ? '' : a.monitor_serial;
     document.getElementById("assetUpsInput").value = a.ups_serial === '-' ? '' : a.ups_serial;
     
-    const deptSelect = document.getElementById("assetDeptSelect");
-    if (deptSelect) {
-      const off = getOfficeInfo(a.office);
-      const targetVal = off.full;
-      let matched = false;
-      for (let opt of deptSelect.options) {
-        if (opt.value === targetVal || opt.value === off.short || opt.value === a.office) {
-          deptSelect.value = opt.value;
-          matched = true;
-          break;
-        }
-      }
-      if (!matched && targetVal) {
-        const newOpt = document.createElement("option");
-        newOpt.value = targetVal;
-        newOpt.textContent = targetVal;
-        deptSelect.appendChild(newOpt);
-        deptSelect.value = targetVal;
-      }
-    }
+    setCustomOfficeValue(a.office || "ICT Staff");
+    closeAllCustomDropdowns();
 
     document.getElementById("assetStatusSelect").value = a.status;
     document.getElementById("assetCpuInput").value = a.processor || "";

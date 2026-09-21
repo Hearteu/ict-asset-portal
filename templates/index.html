@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/styles.css?v=19.0">
+  <link rel="stylesheet" href="/static/css/styles.css?v=20.0">
 </head>
 <body>
 
@@ -376,7 +376,8 @@
             </div>
             <div class="form-group">
               <label class="form-label">Office / Section / Division *</label>
-              <select id="assetDeptSelect" class="form-control" required>
+              <!-- Underlying select kept for complete form & API compatibility -->
+              <select id="assetDeptSelect" style="display: none;" required>
                 <option value="Office of the District Engineer">Office of the District Engineer</option>
                 <option value="Office of the Assistant District Engineer">Office of the Assistant District Engineer</option>
                 <option value="Procurement Unit">Procurement Unit</option>
@@ -397,6 +398,22 @@
                 <option value="Maintenance Section">Maintenance Section</option>
                 <option value="Equipment Service Unit">Equipment Service Unit</option>
               </select>
+
+              <!-- Custom Dropdown Trigger & Popover Menu (Anchored directly below the field) -->
+              <div class="custom-select-wrapper" id="customOfficeSelectWrapper">
+                <div class="custom-select-trigger" id="customOfficeTrigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="customOfficeSelectedText">ICT Staff</span>
+                  <span class="custom-select-arrow">▼</span>
+                </div>
+                <div class="custom-select-menu" id="customOfficeMenu">
+                  <div class="custom-select-search-box">
+                    <input type="text" id="customOfficeSearch" class="custom-select-search-input" placeholder="🔍 Search office..." autocomplete="off">
+                  </div>
+                  <div class="custom-select-options" id="customOfficeOptions" role="listbox">
+                    <!-- Populated dynamically via JS with badges -->
+                  </div>
+                </div>
+              </div>
             </div>
 
             <div class="form-group">
@@ -1014,6 +1031,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="/static/js/portal.js?v=9.0"></script>
+  <script src="/static/js/portal.js?v=10.0"></script>
 </body>
 </html>
