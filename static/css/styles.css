@@ -502,6 +502,53 @@ a, a:hover, a:focus, a:visited, a:active {
   background: #f8fafc;
 }
 
+/* Job Sheet Table Actions Column Layout */
+.job-actions-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 6px;
+  min-width: 115px;
+  max-width: 125px;
+  margin: 0 auto;
+}
+
+.job-status-btn-row {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.job-status-btn-row .btn {
+  width: 100%;
+  justify-content: center;
+  padding: 5px 8px;
+  font-size: 0.78rem;
+  font-weight: 600;
+  white-space: nowrap;
+  border-radius: 6px;
+}
+
+.job-icon-btns-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  width: 100%;
+}
+
+.job-icon-btns-row .btn-icon-only {
+  flex: 1 1 0;
+  height: 28px;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.82rem;
+  border-radius: 6px;
+}
+
 .table-device-cell {
   display: flex;
   flex-direction: column;
@@ -1023,6 +1070,61 @@ a, a:hover, a:focus, a:visited, a:active {
   text-align: center;
   font-size: 0.82rem;
   color: #94a3b8;
+}
+
+/* Custom Computer Option Rows in Job Sheet Modal */
+.custom-asset-option {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start !important;
+  gap: 5px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.custom-asset-option:last-child {
+  border-bottom: none;
+}
+
+.asset-opt-primary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.asset-opt-user {
+  color: #0f172a;
+  font-weight: 700;
+  font-size: 0.88rem;
+}
+
+.asset-opt-device {
+  font-size: 0.72rem;
+  color: #475569;
+  background: #f1f5f9;
+  padding: 2px 7px;
+  border-radius: 4px;
+  font-weight: 600;
+}
+
+.custom-asset-option.selected .asset-opt-device {
+  background: rgba(2, 2, 92, 0.15);
+  color: #02025c;
+}
+
+.asset-opt-secondary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  width: 100%;
+}
+
+.asset-opt-model {
+  font-size: 0.8rem;
+  color: #475569;
+  font-weight: 500;
 }
 
 .form-control:focus {

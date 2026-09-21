@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/styles.css?v=20.0">
+  <link rel="stylesheet" href="/static/css/styles.css?v=23.0">
 </head>
 <body>
 
@@ -245,15 +245,15 @@
           <table class="data-table">
             <thead>
               <tr>
-                <th>Ref. No.</th>
+                <th style="min-width: 110px; white-space: nowrap;">Ref. No.</th>
                 <th>Client (End-User)</th>
-                <th>Office / Section</th>
+                <th>Office</th>
                 <th>Device & Serial</th>
                 <th>Incident / Service Request</th>
                 <th>Status</th>
                 <th>Fulfilled By</th>
-                <th>Date Filed</th>
-                <th>Actions</th>
+                <th style="min-width: 115px; white-space: nowrap;">Date Filed</th>
+                <th style="width: 130px; text-align: center;">ACTIONS</th>
               </tr>
             </thead>
             <tbody id="jobTableBody">
@@ -475,9 +475,26 @@
             
             <div class="form-group col-span-2">
               <label class="form-label">Select Computer to Service (From Inventory) *</label>
-              <select id="jobAssetSelect" class="form-control" required>
+              <!-- Hidden select for full form & API compatibility -->
+              <select id="jobAssetSelect" style="display: none;" required>
                 <!-- Populated dynamically -->
               </select>
+
+              <!-- Custom Computer Selector Dropdown (Anchored strictly below the field) -->
+              <div class="custom-select-wrapper" id="customJobAssetSelectWrapper">
+                <div class="custom-select-trigger" id="customJobAssetTrigger" tabindex="0" role="button" aria-haspopup="listbox" aria-expanded="false">
+                  <span id="customJobAssetSelectedText" style="color: var(--text-muted);">-- Select Computer (End-User / Serial No.) --</span>
+                  <span class="custom-select-arrow">▼</span>
+                </div>
+                <div class="custom-select-menu" id="customJobAssetMenu">
+                  <div class="custom-select-search-box">
+                    <input type="text" id="customJobAssetSearch" class="custom-select-search-input" placeholder="🔍 Search by End-User, Model, Serial, Office..." autocomplete="off">
+                  </div>
+                  <div class="custom-select-options" id="customJobAssetOptions" role="listbox">
+                    <!-- Populated dynamically via JS with rich computer rows -->
+                  </div>
+                </div>
+              </div>
             </div>
 
             <!-- Auto-populated Spec Card Preview -->
@@ -1031,6 +1048,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="/static/js/portal.js?v=10.0"></script>
+  <script src="/static/js/portal.js?v=15.0"></script>
 </body>
 </html>

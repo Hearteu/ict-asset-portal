@@ -295,11 +295,203 @@ function closeAllCustomDropdowns() {
   });
 }
 
+// Custom Job Asset (Computer) Dropdown Controller (Anchored strictly below the field)
+function setupCustomJobAssetDropdown() {
+  const wrapper = document.getElementById("customJobAssetSelectWrapper");
+  const trigger = document.getElementById("customJobAssetTrigger");
+  const searchInput = document.getElementById("customJobAssetSearch");
+  const optionsContainer = document.getElementById("customJobAssetOptions");
+  const selectElem = document.getElementById("jobAssetSelect");
+
+  if (!wrapper || !trigger || !optionsContainer || !selectElem) return;
+
+  renderCustomJobAssetOptions();
+
+  trigger.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = wrapper.classList.contains("open");
+    closeAllCustomDropdowns();
+    if (!isOpen) {
+      wrapper.classList.add("open");
+      trigger.setAttribute("aria-expanded", "true");
+      if (searchInput) {
+        searchInput.value = "";
+        filterCustomJobAssetOptions("");
+        setTimeout(() => searchInput.focus(), 60);
+      }
+    }
+  });
+
+  trigger.addEventListener("keydown", (e) => {
+    if (e.key === "Enter" || e.key === " " || e.key === "ArrowDown") {
+      e.preventDefault();
+      trigger.click();
+    }
+  });
+
+  if (searchInput) {
+    searchInput.addEventListener("input", (e) => {
+      filterCustomJobAssetOptions(e.target.value);
+    });
+    searchInput.addEventListener("click", (e) => e.stopPropagation());
+    searchInput.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        closeAllCustomDropdowns();
+        trigger.focus();
+      }
+    });
+  }
+
+  document.addEventListener("click", (e) => {
+    if (!wrapper.contains(e.target)) {
+      wrapper.classList.remove("open");
+      trigger.setAttribute("aria-expanded", "false");
+    }
+  });
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape" && wrapper.classList.contains("open")) {
+      wrapper.classList.remove("open");
+      trigger.setAttribute("aria-expanded", "false");
+      trigger.focus();
+    }
+  });
+}
+
+function renderCustomJobAssetOptions() {
+  const optionsContainer = document.getElementById("customJobAssetOptions");
+  const selectElem = document.getElementById("jobAssetSelect");
+  if (!optionsContainer || !selectElem) return;
+
+  const currentVal = selectElem.value;
+
+  if (!currentAssets || currentAssets.length === 0) {
+    optionsContainer.innerHTML = `<div class="custom-select-no-results">No registered computers found in inventory.</div>`;
+    return;
+  }
+
+  optionsContainer.innerHTML = currentAssets.map(a => {
+    const off = getOfficeInfo(a.office);
+    const isSelected = (currentVal && String(a.id) === String(currentVal));
+    return `
+      <div class="custom-select-option custom-asset-option ${isSelected ? 'selected' : ''}" data-id="${a.id}" role="option" aria-selected="${isSelected}">
+        <div class="asset-opt-primary">
+          <strong class="asset-opt-user">${a.end_user}</strong>
+          <span class="asset-opt-device">${a.device}</span>
+        </div>
+        <div class="asset-opt-secondary">
+          <span class="asset-opt-model">${a.brand_model}</span>
+          <span class="serial-tag" style="font-size: 0.72rem; padding: 1px 5px;">${a.serial_number}</span>
+          <span class="badge-pill office-badge" style="font-size: 0.7rem; padding: 1px 6px;">${off.short}</span>
+          <span class="status-badge ${getStatusClass(a.status)}" style="font-size: 0.68rem; padding: 2px 7px;">${a.status}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  optionsContainer.querySelectorAll(".custom-asset-option").forEach(item => {
+    item.addEventListener("click", (e) => {
+      e.stopPropagation();
+      const assetId = item.getAttribute("data-id");
+      setCustomJobAssetValue(assetId);
+      closeAllCustomDropdowns();
+      const trigger = document.getElementById("customJobAssetTrigger");
+      if (trigger) trigger.focus();
+    });
+  });
+}
+
+function filterCustomJobAssetOptions(query) {
+  const optionsContainer = document.getElementById("customJobAssetOptions");
+  if (!optionsContainer) return;
+
+  const q = query.trim().toLowerCase();
+  const items = optionsContainer.querySelectorAll(".custom-asset-option");
+  let visibleCount = 0;
+
+  items.forEach(item => {
+    const assetId = item.getAttribute("data-id");
+    const a = currentAssets.find(x => String(x.id) === String(assetId));
+    if (!a) return;
+
+    const off = getOfficeInfo(a.office);
+    const textToSearch = `${a.end_user} ${a.brand_model} ${a.serial_number} ${a.computer_name || ''} ${off.short} ${off.full} ${a.device} ${a.status}`.toLowerCase();
+    
+    if (!q || textToSearch.includes(q)) {
+      item.style.display = "flex";
+      visibleCount++;
+    } else {
+      item.style.display = "none";
+    }
+  });
+
+  let noResults = optionsContainer.querySelector(".custom-select-no-results");
+  if (visibleCount === 0) {
+    if (!noResults) {
+      noResults = document.createElement("div");
+      noResults.className = "custom-select-no-results";
+      noResults.textContent = "No matching computers found";
+      optionsContainer.appendChild(noResults);
+    }
+    noResults.style.display = "block";
+  } else if (noResults) {
+    noResults.style.display = "none";
+  }
+}
+
+function setCustomJobAssetValue(assetId) {
+  const selectElem = document.getElementById("jobAssetSelect");
+  const selectedTextElem = document.getElementById("customJobAssetSelectedText");
+  const optionsContainer = document.getElementById("customJobAssetOptions");
+
+  if (selectElem) {
+    selectElem.value = assetId ? String(assetId) : "";
+  }
+
+  if (!assetId) {
+    if (selectedTextElem) {
+      selectedTextElem.innerHTML = `<span style="color: var(--text-muted);">-- Select Computer (End-User / Serial No.) --</span>`;
+    }
+    if (optionsContainer) {
+      optionsContainer.querySelectorAll(".custom-asset-option").forEach(item => {
+        item.classList.remove("selected");
+        item.setAttribute("aria-selected", "false");
+      });
+    }
+    updateJobSheetAssetPreview(null);
+    return;
+  }
+
+  const asset = currentAssets.find(x => String(x.id) === String(assetId));
+  if (asset) {
+    const off = getOfficeInfo(asset.office);
+    if (selectedTextElem) {
+      selectedTextElem.innerHTML = `
+        <span style="font-weight: 700; color: #02025c;">${asset.end_user}</span>
+        <span style="color: #64748b; font-size: 0.82rem; margin: 0 4px;">—</span>
+        <span style="color: #334155; font-size: 0.84rem;">${asset.brand_model} (${asset.serial_number})</span>
+        <span class="badge-pill office-badge" style="margin-left: 6px; font-size: 0.7rem; padding: 1px 6px;">${off.short}</span>
+      `;
+    }
+
+    if (optionsContainer) {
+      optionsContainer.querySelectorAll(".custom-asset-option").forEach(item => {
+        const isSelected = (item.getAttribute("data-id") === String(assetId));
+        item.classList.toggle("selected", isSelected);
+        item.setAttribute("aria-selected", isSelected ? "true" : "false");
+      });
+    }
+
+    updateJobSheetAssetPreview(asset.id);
+  }
+}
+
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   setupNavigation();
   setupEventListeners();
   setupCustomOfficeDropdown();
+  setupCustomJobAssetDropdown();
   loadAllData();
 });
 
@@ -570,6 +762,7 @@ function populateAssetSelect(assets) {
     }).join("");
 
   if (currentVal) select.value = currentVal;
+  renderCustomJobAssetOptions();
 }
 
 function updateJobSheetAssetPreview(assetId) {
@@ -629,17 +822,19 @@ function renderJobsTable(jobs) {
     return;
   }
 
-  tbody.innerHTML = jobs.map(j => `
+  tbody.innerHTML = jobs.map(j => {
+    const off = getOfficeInfo(j.section_division);
+    return `
     <tr>
-      <td>
-        <strong style="color: #02025c; font-family: monospace; font-size: 0.9rem;">${j.ref_no}</strong>
+      <td style="white-space: nowrap;">
+        <strong style="color: #02025c; font-family: monospace; font-size: 0.9rem; white-space: nowrap;">${j.ref_no}</strong>
       </td>
       <td>
         <div style="font-weight: 600; color: #0f172a;">${j.full_name}</div>
         <div style="font-size: 0.72rem; color: var(--text-muted);">${j.contact_no ? 'Tel: ' + j.contact_no : ''}</div>
       </td>
       <td>
-        <span class="badge-pill">${j.section_division}</span>
+        <span class="badge-pill office-badge" title="${off.full}" data-tooltip="${off.full}">${off.short}</span>
       </td>
       <td>
         <div><strong style="color: #0f172a;">${j.hardware_brand_model || 'N/A'}</strong></div>
@@ -656,19 +851,24 @@ function renderJobsTable(jobs) {
       <td>
         <div style="font-size: 0.84rem;">${j.fulfilled_by || 'Unassigned'}</div>
       </td>
-      <td>
-        <div style="font-size: 0.78rem; color: var(--text-secondary);">${j.date_of_filing || ''}</div>
+      <td style="white-space: nowrap;">
+        <div style="font-size: 0.82rem; color: var(--text-secondary); white-space: nowrap;">${j.date_of_filing || ''}</div>
       </td>
-      <td>
-        <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
-          ${getNextStatusActionHtml(j)}
-          <button class="btn btn-secondary btn-sm btn-icon-only" onclick="openEditJobSheetModal(${j.id})" title="Edit Job Sheet">✏️</button>
-          ${j.status === 'Closed' ? `<button class="btn btn-primary btn-sm btn-icon-only" onclick="openPrintableJobSheet(${j.id})" title="Print Official DPWH Job Sheet Form">🖨️</button>` : ''}
-          <button class="btn btn-danger btn-sm btn-icon-only" onclick="promptDeleteJobSheet(${j.id}, '${(j.ref_no || '').replace(/'/g, "\\'")}')" title="Delete Job Sheet">🗑️</button>
+      <td style="text-align: center;">
+        <div class="job-actions-wrapper">
+          <div class="job-status-btn-row">
+            ${getNextStatusActionHtml(j)}
+          </div>
+          <div class="job-icon-btns-row">
+            <button class="btn btn-secondary btn-sm btn-icon-only" onclick="openEditJobSheetModal(${j.id})" title="Edit Job Sheet">✏️</button>
+            <button class="btn btn-primary btn-sm btn-icon-only" onclick="openPrintableJobSheet(${j.id})" title="Print Official DPWH Job Sheet Form">🖨️</button>
+            <button class="btn btn-danger btn-sm btn-icon-only" onclick="promptDeleteJobSheet(${j.id}, '${(j.ref_no || '').replace(/'/g, "\\'")}')" title="Delete Job Sheet">🗑️</button>
+          </div>
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
 }
 
 // Repair History Audit View
@@ -887,6 +1087,8 @@ function openNewJobSheetModal() {
   document.getElementById("jobDateFiling").value = new Date().toISOString().split("T")[0];
   document.getElementById("jobDateReceived").value = `${new Date().toISOString().split("T")[0]} 08:30 AM`;
   document.getElementById("jobSection").value = "ICTS";
+  setCustomJobAssetValue("");
+  closeAllCustomDropdowns();
   document.getElementById("jobAssetPreviewCard").style.display = "none";
   const delBtn = document.getElementById("btnDeleteJobSheetModal");
   if (delBtn) delBtn.style.display = "none";
@@ -895,11 +1097,8 @@ function openNewJobSheetModal() {
 
 function openNewJobSheetForAsset(assetId) {
   openNewJobSheetModal();
-  const select = document.getElementById("jobAssetSelect");
-  if (select) {
-    select.value = assetId;
-    updateJobSheetAssetPreview(assetId);
-  }
+  setCustomJobAssetValue(assetId);
+  closeAllCustomDropdowns();
 }
 
 async function openEditJobSheetModal(jobId) {
@@ -920,8 +1119,8 @@ async function openEditJobSheetModal(jobId) {
 
     const delBtn = document.getElementById("btnDeleteJobSheetModal");
     if (delBtn) delBtn.style.display = "inline-flex";
-    document.getElementById("jobAssetSelect").value = j.asset_id;
-    updateJobSheetAssetPreview(j.asset_id);
+    setCustomJobAssetValue(j.asset_id);
+    closeAllCustomDropdowns();
 
     document.getElementById("jobClientName").value = j.full_name;
     document.getElementById("jobSection").value = j.section_division;
