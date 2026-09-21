@@ -590,6 +590,76 @@ a, a:hover, a:focus, a:visited, a:active {
 .priority-High { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
 .priority-Critical { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
 
+/* Office Section Badges with Hover Fullname Tooltip */
+.badge-pill, .office-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  background: #f1f5f9;
+  color: #02025c;
+  border: 1px solid #cbd5e1;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  cursor: help;
+  position: relative;
+  transition: all 0.18s ease;
+  user-select: none;
+}
+
+.office-badge:hover, .badge-pill:hover {
+  background: #02025c;
+  color: #ffffff;
+  border-color: #02025c;
+  box-shadow: 0 3px 8px rgba(2, 2, 92, 0.22);
+  transform: translateY(-1px);
+}
+
+.office-badge[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: 125%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: #02025c;
+  color: #ffffff;
+  padding: 5px 11px;
+  border-radius: 6px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  letter-spacing: normal;
+}
+
+.office-badge[data-tooltip]::before {
+  content: "";
+  position: absolute;
+  bottom: 102%;
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #02025c transparent transparent transparent;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  z-index: 1000;
+}
+
+.office-badge[data-tooltip]:hover::after,
+.office-badge[data-tooltip]:hover::before {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
 /* Filter Toolbar */
 .toolbar {
   display: flex;

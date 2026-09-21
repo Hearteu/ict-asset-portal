@@ -10,6 +10,109 @@ let editingJobId = null;
 let resolvingJobId = null;
 let closingJobId = null;
 
+// Official 19 DPWH Offices / Sections / Divisions Mapping
+const OFFICE_MAP = {
+  // 1. Office of the District Engineer -> ODE
+  "Office of the District Engineer": { short: "ODE", full: "Office of the District Engineer" },
+  "ODE": { short: "ODE", full: "Office of the District Engineer" },
+  "DE Office": { short: "ODE", full: "Office of the District Engineer" },
+
+  // 2. Office of the Assistant District Engineer -> OADE
+  "Office of the Assistant District Engineer": { short: "OADE", full: "Office of the Assistant District Engineer" },
+  "OADE": { short: "OADE", full: "Office of the Assistant District Engineer" },
+  "ADE Office": { short: "OADE", full: "Office of the Assistant District Engineer" },
+
+  // 3. Procurement Unit -> Procurement
+  "Procurement Unit": { short: "Procurement", full: "Procurement Unit" },
+  "Procurement": { short: "Procurement", full: "Procurement Unit" },
+
+  // 4. PIO Staff -> PIO
+  "PIO Staff": { short: "PIO", full: "PIO Staff" },
+  "PIO": { short: "PIO", full: "PIO Staff" },
+
+  // 5. ICT Staff -> ICTS
+  "ICT Staff": { short: "ICTS", full: "ICT Staff" },
+  "ICTS": { short: "ICTS", full: "ICT Staff" },
+  "ODE-ICTS": { short: "ICTS", full: "ICT Staff" },
+
+  // 6. Commission On Audit -> COA
+  "Commission On Audit": { short: "COA", full: "Commission On Audit" },
+  "COA": { short: "COA", full: "Commission On Audit" },
+
+  // 7. Administrative Section -> AS
+  "Administrative Section": { short: "AS", full: "Administrative Section" },
+  "AS": { short: "AS", full: "Administrative Section" },
+  "Admin Office": { short: "AS", full: "Administrative Section" },
+
+  // 8. Human Resource Management Unit -> HRMU
+  "Human Resource Management Unit": { short: "HRMU", full: "Human Resource Management Unit" },
+  "HRMU": { short: "HRMU", full: "Human Resource Management Unit" },
+
+  // 9. Records Management Unit -> Records
+  "Records Management Unit": { short: "Records", full: "Records Management Unit" },
+  "Records": { short: "Records", full: "Records Management Unit" },
+  "Records Unit": { short: "Records", full: "Records Management Unit" },
+
+  // 10. Cash Management Unit -> Cash Unit
+  "Cash Management Unit": { short: "Cash Unit", full: "Cash Management Unit" },
+  "Cash Unit": { short: "Cash Unit", full: "Cash Management Unit" },
+
+  // 11. Supply and Property Management Unit -> Supply
+  "Supply and Property Management Unit": { short: "Supply", full: "Supply and Property Management Unit" },
+  "Supply": { short: "Supply", full: "Supply and Property Management Unit" },
+  "Supply Management Unit": { short: "Supply", full: "Supply and Property Management Unit" },
+
+  // 12. General Services Office -> GSO
+  "General Services Office": { short: "GSO", full: "General Services Office" },
+  "GSO": { short: "GSO", full: "General Services Office" },
+
+  // 13. Finance Section -> FS
+  "Finance Section": { short: "FS", full: "Finance Section" },
+  "FS": { short: "FS", full: "Finance Section" },
+
+  // 14. Planning and Design Section -> PDS
+  "Planning and Design Section": { short: "PDS", full: "Planning and Design Section" },
+  "PDS": { short: "PDS", full: "Planning and Design Section" },
+  "Planning & Design Section": { short: "PDS", full: "Planning and Design Section" },
+
+  // 15. Construction Section -> CS
+  "Construction Section": { short: "CS", full: "Construction Section" },
+  "CS": { short: "CS", full: "Construction Section" },
+  "Construction": { short: "CS", full: "Construction Section" },
+
+  // 16. Quality Assurance Section -> QAS
+  "Quality Assurance Section": { short: "QAS", full: "Quality Assurance Section" },
+  "QAS": { short: "QAS", full: "Quality Assurance Section" },
+
+  // 17. Quality Assurance Laboratory -> QA Lab
+  "Quality Assurance Laboratory": { short: "QA Lab", full: "Quality Assurance Laboratory" },
+  "QA Lab": { short: "QA Lab", full: "Quality Assurance Laboratory" },
+  "QA Laboratory": { short: "QA Lab", full: "Quality Assurance Laboratory" },
+
+  // 18. Maintenance Section -> Maintenance
+  "Maintenance Section": { short: "Maintenance", full: "Maintenance Section" },
+  "Maintenance": { short: "Maintenance", full: "Maintenance Section" },
+
+  // 19. Equipment Service Unit -> ESU
+  "Equipment Service Unit": { short: "ESU", full: "Equipment Service Unit" },
+  "ESU": { short: "ESU", full: "Equipment Service Unit" }
+};
+
+function getOfficeInfo(office) {
+  if (!office) return { short: "ICTS", full: "ICT Staff" };
+  const trimmed = office.trim();
+  if (OFFICE_MAP[trimmed]) {
+    return OFFICE_MAP[trimmed];
+  }
+  const lower = trimmed.toLowerCase();
+  for (const k in OFFICE_MAP) {
+    if (k.toLowerCase() === lower) {
+      return OFFICE_MAP[k];
+    }
+  }
+  return { short: trimmed, full: trimmed };
+}
+
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
   setupNavigation();
@@ -231,7 +334,9 @@ function renderAssetsTable(assets) {
 
   // Exact Excel Columns without redundant repair history column:
   // END-USER | DEVICE | BRAND and MODEL | SERIAL NUMBER | COMPUTER NAME | MONITOR with S/N | UPS with S/N | OFFICE | ACTIONS
-  tbody.innerHTML = assets.map(a => `
+  tbody.innerHTML = assets.map(a => {
+    const off = getOfficeInfo(a.office);
+    return `
     <tr>
       <td>
         <strong style="color: #0284c7; cursor: pointer;" onclick="viewAssetDetails(${a.id})" title="Click to view full profile & repair history">${a.end_user}</strong>
@@ -256,7 +361,7 @@ function renderAssetsTable(assets) {
         <span style="font-size: 0.78rem; color: var(--text-secondary);">${a.ups_serial || '-'}</span>
       </td>
       <td>
-        <span class="badge-pill">${a.office}</span>
+        <span class="badge-pill office-badge" title="${off.full}" data-tooltip="${off.full}">${off.short}</span>
       </td>
       <td style="text-align: center; white-space: nowrap;">
         <div class="action-btns-group">
@@ -266,7 +371,8 @@ function renderAssetsTable(assets) {
         </div>
       </td>
     </tr>
-  `).join("");
+  `;
+  }).join("");
 }
 
 function populateAssetSelect(assets) {
@@ -275,7 +381,10 @@ function populateAssetSelect(assets) {
 
   const currentVal = select.value;
   select.innerHTML = `<option value="">-- Select Computer (End-User / Serial No.) --</option>` +
-    assets.map(a => `<option value="${a.id}">${a.end_user} | ${a.brand_model} (${a.serial_number}) - ${a.office}</option>`).join("");
+    assets.map(a => {
+      const off = getOfficeInfo(a.office);
+      return `<option value="${a.id}">${a.end_user} | ${a.brand_model} (${a.serial_number}) - ${off.short}</option>`;
+    }).join("");
 
   if (currentVal) select.value = currentVal;
 }
@@ -292,18 +401,19 @@ function updateJobSheetAssetPreview(assetId) {
   const asset = currentAssets.find(a => a.id == assetId);
   if (!asset) return;
 
+  const off = getOfficeInfo(asset.office);
   card.style.display = "grid";
   document.getElementById("previewOwner").textContent = asset.end_user || "Unassigned";
   document.getElementById("previewModel").textContent = asset.brand_model || "N/A";
   document.getElementById("previewSerial").textContent = asset.serial_number || "N/A";
   document.getElementById("previewCompName").textContent = asset.computer_name || "N/A";
-  document.getElementById("previewOffice").textContent = asset.office || "ODE-ICTS";
+  document.getElementById("previewOffice").textContent = `${off.short} (${off.full})`;
   document.getElementById("previewStatus").textContent = asset.status || "N/A";
 
   // Auto-fill Client and Hardware info fields in Job Sheet Form
   if (!editingJobId) {
     document.getElementById("jobClientName").value = asset.end_user || "";
-    document.getElementById("jobSection").value = asset.office || "ODE-ICTS";
+    document.getElementById("jobSection").value = off.short;
     document.getElementById("jobDateFiling").value = new Date().toISOString().split("T")[0];
     document.getElementById("jobDateReceived").value = `${new Date().toISOString().split("T")[0]} 08:30 AM`;
   }
@@ -444,7 +554,8 @@ async function viewAssetDetails(assetId) {
     document.getElementById("detailCompName").textContent = asset.computer_name || "-";
     document.getElementById("detailMonitor").textContent = asset.monitor_serial || "-";
     document.getElementById("detailUps").textContent = asset.ups_serial || "-";
-    document.getElementById("detailDept").textContent = asset.office;
+    const off = getOfficeInfo(asset.office);
+    document.getElementById("detailDept").innerHTML = `<span class="badge-pill office-badge" title="${off.full}" data-tooltip="${off.full}">${off.short}</span> <span style="font-size: 0.85rem; color: var(--text-secondary); margin-left: 6px;">(${off.full})</span>`;
     document.getElementById("detailType").textContent = asset.device;
     document.getElementById("detailStatus").innerHTML = `<span class="status-badge ${getStatusClass(asset.status)}">${asset.status}</span>`;
 
@@ -497,7 +608,8 @@ function openNewAssetModal() {
   editingAssetId = null;
   document.getElementById("assetModalTitle").textContent = "Register Computer to Inventory";
   document.getElementById("assetForm").reset();
-  document.getElementById("assetDeptInput").value = "ODE-ICTS";
+  const deptSelect = document.getElementById("assetDeptSelect");
+  if (deptSelect) deptSelect.value = "ICT Staff";
   document.getElementById("assetModal").classList.add("active");
 }
 
@@ -515,7 +627,28 @@ async function openEditAssetModal(assetId) {
     document.getElementById("assetComputerNameInput").value = a.computer_name === '-' ? '' : a.computer_name;
     document.getElementById("assetMonitorInput").value = a.monitor_serial === '-' ? '' : a.monitor_serial;
     document.getElementById("assetUpsInput").value = a.ups_serial === '-' ? '' : a.ups_serial;
-    document.getElementById("assetDeptInput").value = a.office;
+    
+    const deptSelect = document.getElementById("assetDeptSelect");
+    if (deptSelect) {
+      const off = getOfficeInfo(a.office);
+      const targetVal = off.full;
+      let matched = false;
+      for (let opt of deptSelect.options) {
+        if (opt.value === targetVal || opt.value === off.short || opt.value === a.office) {
+          deptSelect.value = opt.value;
+          matched = true;
+          break;
+        }
+      }
+      if (!matched && targetVal) {
+        const newOpt = document.createElement("option");
+        newOpt.value = targetVal;
+        newOpt.textContent = targetVal;
+        deptSelect.appendChild(newOpt);
+        deptSelect.value = targetVal;
+      }
+    }
+
     document.getElementById("assetStatusSelect").value = a.status;
     document.getElementById("assetCpuInput").value = a.processor || "";
     document.getElementById("assetRamInput").value = a.ram || "";
@@ -530,6 +663,7 @@ async function openEditAssetModal(assetId) {
 
 async function handleAssetFormSubmit(e) {
   e.preventDefault();
+  const deptSelect = document.getElementById("assetDeptSelect");
   const payload = {
     end_user: document.getElementById("assetOwnerInput").value.trim(),
     device: document.getElementById("assetTypeSelect").value,
@@ -538,7 +672,7 @@ async function handleAssetFormSubmit(e) {
     computer_name: document.getElementById("assetComputerNameInput").value.trim(),
     monitor_serial: document.getElementById("assetMonitorInput").value.trim(),
     ups_serial: document.getElementById("assetUpsInput").value.trim(),
-    office: document.getElementById("assetDeptInput").value.trim(),
+    office: deptSelect ? deptSelect.value.trim() : "ICT Staff",
     status: document.getElementById("assetStatusSelect").value,
     processor: document.getElementById("assetCpuInput").value.trim(),
     ram: document.getElementById("assetRamInput").value.trim(),
@@ -587,7 +721,7 @@ function openNewJobSheetModal() {
   document.getElementById("jobSheetForm").reset();
   document.getElementById("jobDateFiling").value = new Date().toISOString().split("T")[0];
   document.getElementById("jobDateReceived").value = `${new Date().toISOString().split("T")[0]} 08:30 AM`;
-  document.getElementById("jobSection").value = "ODE-ICTS";
+  document.getElementById("jobSection").value = "ICTS";
   document.getElementById("jobAssetPreviewCard").style.display = "none";
   const delBtn = document.getElementById("btnDeleteJobSheetModal");
   if (delBtn) delBtn.style.display = "none";
@@ -969,7 +1103,8 @@ async function openPrintableJobSheet(jobId) {
 
     // Client Info
     document.getElementById("printClientName").textContent = j.full_name || "";
-    document.getElementById("printSection").textContent = j.section_division || "ODE-ICTS";
+    const off = getOfficeInfo(j.section_division);
+    document.getElementById("printSection").textContent = off.short;
     document.getElementById("printDateFiling").textContent = j.date_of_filing || "";
     document.getElementById("printContact").textContent = j.contact_no || "";
     document.getElementById("printIncident").textContent = j.incident_description || "";

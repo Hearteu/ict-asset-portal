@@ -18,6 +18,28 @@ class Asset(models.Model):
         ('Decommissioned', 'Decommissioned'),
     ]
 
+    OFFICE_CHOICES = [
+        ('Office of the District Engineer', 'Office of the District Engineer'),
+        ('Office of the Assistant District Engineer', 'Office of the Assistant District Engineer'),
+        ('Procurement Unit', 'Procurement Unit'),
+        ('PIO Staff', 'PIO Staff'),
+        ('ICT Staff', 'ICT Staff'),
+        ('Commission On Audit', 'Commission On Audit'),
+        ('Administrative Section', 'Administrative Section'),
+        ('Human Resource Management Unit', 'Human Resource Management Unit'),
+        ('Records Management Unit', 'Records Management Unit'),
+        ('Cash Management Unit', 'Cash Management Unit'),
+        ('Supply and Property Management Unit', 'Supply and Property Management Unit'),
+        ('General Services Office', 'General Services Office'),
+        ('Finance Section', 'Finance Section'),
+        ('Planning and Design Section', 'Planning and Design Section'),
+        ('Construction Section', 'Construction Section'),
+        ('Quality Assurance Section', 'Quality Assurance Section'),
+        ('Quality Assurance Laboratory', 'Quality Assurance Laboratory'),
+        ('Maintenance Section', 'Maintenance Section'),
+        ('Equipment Service Unit', 'Equipment Service Unit'),
+    ]
+
     # Aligned with the Excel Inventory Sheet:
     # END-USER | DEVICE | BRAND and MODEL | SERIAL NUMBER | COMPUTER NAME | MONITOR with S/N | UPS with S/N | OFFICE | REPAIR HISTORY
     end_user = models.CharField(max_length=150, verbose_name="End-User", default="Unassigned", db_index=True)
@@ -27,7 +49,7 @@ class Asset(models.Model):
     computer_name = models.CharField(max_length=100, blank=True, default="", verbose_name="Computer Name")
     monitor_serial = models.CharField(max_length=150, blank=True, default="", verbose_name="Monitor with Serial Number")
     ups_serial = models.CharField(max_length=150, blank=True, default="", verbose_name="UPS with Serial Number")
-    office = models.CharField(max_length=150, default="ODE-ICTS", verbose_name="Office / Section / Division")
+    office = models.CharField(max_length=150, choices=OFFICE_CHOICES, default="ICT Staff", verbose_name="Office / Section / Division")
 
     # Status & Life Cycle
     status = models.CharField(max_length=50, choices=STATUS_CHOICES, default='In Use', db_index=True)
@@ -61,7 +83,7 @@ class Asset(models.Model):
             "computer_name": self.computer_name or "-",
             "monitor_serial": self.monitor_serial or "-",
             "ups_serial": self.ups_serial or "-",
-            "office": self.office or "ODE-ICTS",
+            "office": self.office or "ICT Staff",
             "status": self.status,
             "asset_tag": self.asset_tag or self.serial_number,
             "processor": self.processor,
@@ -107,7 +129,7 @@ class JobSheet(models.Model):
 
     # CLIENT'S INFORMATION and SERVICE REQUEST
     full_name = models.CharField(max_length=150, verbose_name="Full Name")
-    section_division = models.CharField(max_length=150, default="ODE-ICTS", verbose_name="Section/Division")
+    section_division = models.CharField(max_length=150, default="ICTS", verbose_name="Section/Division")
     date_of_filing = models.CharField(max_length=50, verbose_name="Date of Filing")
     contact_no = models.CharField(max_length=50, blank=True, default="", verbose_name="Contact No.")
     incident_description = models.TextField(verbose_name="Brief description of the Incident or Request")

@@ -7,7 +7,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/css/styles.css?v=18.0">
+  <link rel="stylesheet" href="/static/css/styles.css?v=19.0">
 </head>
 <body>
 
@@ -372,11 +372,31 @@
 
             <div class="form-group">
               <label class="form-label">Computer Name</label>
-              <input type="text" id="assetComputerNameInput" class="form-control" placeholder="e.g. ODE-ICTS-DT04">
+              <input type="text" id="assetComputerNameInput" class="form-control" placeholder="e.g. ICTS-DT04">
             </div>
             <div class="form-group">
-              <label class="form-label">Office / Section / Division</label>
-              <input type="text" id="assetDeptInput" class="form-control" value="ODE-ICTS" placeholder="e.g. ODE-ICTS">
+              <label class="form-label">Office / Section / Division *</label>
+              <select id="assetDeptSelect" class="form-control" required>
+                <option value="Office of the District Engineer">Office of the District Engineer</option>
+                <option value="Office of the Assistant District Engineer">Office of the Assistant District Engineer</option>
+                <option value="Procurement Unit">Procurement Unit</option>
+                <option value="PIO Staff">PIO Staff</option>
+                <option value="ICT Staff" selected>ICT Staff</option>
+                <option value="Commission On Audit">Commission On Audit</option>
+                <option value="Administrative Section">Administrative Section</option>
+                <option value="Human Resource Management Unit">Human Resource Management Unit</option>
+                <option value="Records Management Unit">Records Management Unit</option>
+                <option value="Cash Management Unit">Cash Management Unit</option>
+                <option value="Supply and Property Management Unit">Supply and Property Management Unit</option>
+                <option value="General Services Office">General Services Office</option>
+                <option value="Finance Section">Finance Section</option>
+                <option value="Planning and Design Section">Planning and Design Section</option>
+                <option value="Construction Section">Construction Section</option>
+                <option value="Quality Assurance Section">Quality Assurance Section</option>
+                <option value="Quality Assurance Laboratory">Quality Assurance Laboratory</option>
+                <option value="Maintenance Section">Maintenance Section</option>
+                <option value="Equipment Service Unit">Equipment Service Unit</option>
+              </select>
             </div>
 
             <div class="form-group">
@@ -463,7 +483,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Section / Division</label>
-              <input type="text" id="jobSection" class="form-control" value="ODE-ICTS" placeholder="e.g. ODE-ICTS">
+              <input type="text" id="jobSection" class="form-control" value="ICTS" placeholder="e.g. ICTS">
             </div>
 
             <div class="form-group">
@@ -994,6 +1014,6 @@
   <!-- Toast Notification Container -->
   <div class="toast-container" id="toastContainer"></div>
 
-  <script src="/static/js/portal.js?v=7.0"></script>
+  <script src="/static/js/portal.js?v=9.0"></script>
 </body>
 </html>
