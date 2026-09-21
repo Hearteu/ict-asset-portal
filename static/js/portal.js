@@ -580,7 +580,6 @@ function setupEventListeners() {
     filterDataGlobally(val);
   });
   document.getElementById("jobStatusFilter")?.addEventListener("change", loadJobs);
-  document.getElementById("confirmDeleteJobBtn")?.addEventListener("click", confirmDeleteJobSheet);
 
   // History Filter
   const historySearch = document.getElementById("historySearchInput");
@@ -603,6 +602,14 @@ function setupEventListeners() {
         closeAllModals();
       }
     });
+  });
+
+  // Close modals on Escape key
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeAllModals();
+      closeAllCustomDropdowns();
+    }
   });
 
   // Forms
@@ -1644,4 +1651,5 @@ window.deleteCurrentEditingJobSheet = deleteCurrentEditingJobSheet;
 window.promptDeleteAsset = promptDeleteAsset;
 window.deleteCurrentEditingAsset = deleteCurrentEditingAsset;
 window.openPrintableJobSheet = openPrintableJobSheet;
+window.closeAllModals = closeAllModals;
 
