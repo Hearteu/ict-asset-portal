@@ -7,6 +7,8 @@ let currentAssets = [];
 let currentJobs = [];
 let editingAssetId = null;
 let editingJobId = null;
+let resolvingJobId = null;
+let closingJobId = null;
 
 // Initialize on DOM load
 document.addEventListener("DOMContentLoaded", () => {
@@ -128,6 +130,8 @@ function setupEventListeners() {
   // Forms
   document.getElementById("assetForm")?.addEventListener("submit", handleAssetFormSubmit);
   document.getElementById("jobSheetForm")?.addEventListener("submit", handleJobSheetFormSubmit);
+  document.getElementById("resolveJobForm")?.addEventListener("submit", handleResolveFormSubmit);
+  document.getElementById("closeJobForm")?.addEventListener("submit", handleCloseFormSubmit);
 
   // Asset selector in Job Sheet Modal - auto fills client & hardware info
   document.getElementById("jobAssetSelect")?.addEventListener("change", (e) => {
@@ -139,6 +143,8 @@ function closeAllModals() {
   document.querySelectorAll(".modal-overlay").forEach(el => el.classList.remove("active"));
   editingAssetId = null;
   editingJobId = null;
+  resolvingJobId = null;
+  closingJobId = null;
 }
 
 // Load Data
@@ -177,7 +183,7 @@ async function loadRecentActivity() {
     container.innerHTML = jobs.slice(0, 5).map(job => `
       <div style="display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--border-color);">
         <div>
-          <div style="font-weight: 600; font-size: 0.88rem;">${job.ref_no} &bull; <span style="color: #38bdf8;">${job.full_name || 'N/A'}</span></div>
+          <div style="font-weight: 600; font-size: 0.88rem;">${job.ref_no} &bull; <span style="color: #02025c; font-weight: 700;">${job.full_name || 'N/A'}</span></div>
           <div style="font-size: 0.78rem; color: var(--text-secondary); max-width: 320px; text-overflow: ellipsis; overflow: hidden; white-space: nowrap;">
             ${job.incident_description}
           </div>
@@ -228,20 +234,20 @@ function renderAssetsTable(assets) {
   tbody.innerHTML = assets.map(a => `
     <tr>
       <td>
-        <strong style="color: #38bdf8; cursor: pointer;" onclick="viewAssetDetails(${a.id})" title="Click to view full profile & repair history">${a.end_user}</strong>
+        <strong style="color: #0284c7; cursor: pointer;" onclick="viewAssetDetails(${a.id})" title="Click to view full profile & repair history">${a.end_user}</strong>
       </td>
       <td>
         <span style="font-size: 0.82rem; color: var(--text-secondary);">${a.device}</span>
       </td>
       <td>
-        <div style="font-weight: 600; color: #fff;">${a.brand_model}</div>
+        <div style="font-weight: 600; color: #0f172a;">${a.brand_model}</div>
         <div style="font-size: 0.72rem; color: var(--text-muted);">${a.processor || ''}</div>
       </td>
       <td>
         <span class="serial-tag">${a.serial_number}</span>
       </td>
       <td>
-        <span style="font-family: monospace; font-size: 0.82rem; color: #e2e8f0;">${a.computer_name || '-'}</span>
+        <span style="font-family: monospace; font-size: 0.82rem; color: #0f172a; font-weight: 600;">${a.computer_name || '-'}</span>
       </td>
       <td>
         <span style="font-size: 0.78rem; color: var(--text-secondary);">${a.monitor_serial || '-'}</span>
@@ -250,7 +256,7 @@ function renderAssetsTable(assets) {
         <span style="font-size: 0.78rem; color: var(--text-secondary);">${a.ups_serial || '-'}</span>
       </td>
       <td>
-        <span class="badge-pill" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">${a.office}</span>
+        <span class="badge-pill">${a.office}</span>
       </td>
       <td style="text-align: center; white-space: nowrap;">
         <div class="action-btns-group">
@@ -333,21 +339,21 @@ function renderJobsTable(jobs) {
   tbody.innerHTML = jobs.map(j => `
     <tr>
       <td>
-        <strong style="color: #38bdf8; font-family: monospace; font-size: 0.9rem;">${j.ref_no}</strong>
+        <strong style="color: #02025c; font-family: monospace; font-size: 0.9rem;">${j.ref_no}</strong>
       </td>
       <td>
-        <div style="font-weight: 600; color: #fff;">${j.full_name}</div>
+        <div style="font-weight: 600; color: #0f172a;">${j.full_name}</div>
         <div style="font-size: 0.72rem; color: var(--text-muted);">${j.contact_no ? 'Tel: ' + j.contact_no : ''}</div>
       </td>
       <td>
-        <span class="badge-pill" style="background: rgba(56, 189, 248, 0.15); color: #38bdf8;">${j.section_division}</span>
+        <span class="badge-pill">${j.section_division}</span>
       </td>
       <td>
-        <div><strong style="color: #fff;">${j.hardware_brand_model || 'N/A'}</strong></div>
+        <div><strong style="color: #0f172a;">${j.hardware_brand_model || 'N/A'}</strong></div>
         <span class="serial-tag">${j.hardware_serial_number || 'N/A'}</span>
       </td>
       <td>
-        <div style="max-width: 260px; font-size: 0.84rem; color: #f1f5f9;">
+        <div style="max-width: 260px; font-size: 0.84rem; color: #334155;">
           ${j.incident_description}
         </div>
       </td>
@@ -364,7 +370,7 @@ function renderJobsTable(jobs) {
         <div style="display: flex; gap: 5px; align-items: center; flex-wrap: wrap;">
           ${getNextStatusActionHtml(j)}
           <button class="btn btn-secondary btn-sm btn-icon-only" onclick="openEditJobSheetModal(${j.id})" title="Edit Job Sheet">✏️</button>
-          <button class="btn btn-primary btn-sm btn-icon-only" onclick="openPrintableJobSheet(${j.id})" title="Print Official DPWH Job Sheet Form">🖨️</button>
+          ${j.status === 'Closed' ? `<button class="btn btn-primary btn-sm btn-icon-only" onclick="openPrintableJobSheet(${j.id})" title="Print Official DPWH Job Sheet Form">🖨️</button>` : ''}
           <button class="btn btn-danger btn-sm btn-icon-only" onclick="promptDeleteJobSheet(${j.id}, '${(j.ref_no || '').replace(/'/g, "\\'")}')" title="Delete Job Sheet">🗑️</button>
         </div>
       </td>
@@ -402,7 +408,7 @@ function renderTimeline(jobs) {
         <div>
           <span class="timeline-job-no">Ref: ${j.ref_no}</span>
           <span style="margin: 0 8px; color: var(--text-muted);">&bull;</span>
-          <strong style="color: #fff;">${j.full_name}</strong> (${j.hardware_brand_model} &bull; <code>${j.hardware_serial_number}</code>)
+          <strong style="color: #0f172a;">${j.full_name}</strong> (${j.hardware_brand_model} &bull; <code>${j.hardware_serial_number}</code>)
         </div>
         <div>
           <span class="status-badge ${getStatusClass(j.status)}" style="margin-right: 8px;">${j.status}</span>
@@ -568,7 +574,16 @@ async function handleAssetFormSubmit(e) {
 // Modal Handlers: Add / Edit Job Sheet
 function openNewJobSheetModal() {
   editingJobId = null;
-  document.getElementById("jobSheetModalTitle").textContent = "Official DPWH Job Sheet Form";
+  document.getElementById("jobSheetModalTitle").textContent = "New Service Request Form";
+  const submitBtn = document.getElementById("btnSubmitJobSheet");
+  if (submitBtn) submitBtn.textContent = "File Job Sheet";
+
+  // In new job sheet form, only show Client Info & Service Request (Section 1)
+  const sec2 = document.getElementById("jobSection2Wrapper");
+  if (sec2) sec2.style.display = "none";
+  const sec3 = document.getElementById("jobSection3Wrapper");
+  if (sec3) sec3.style.display = "none";
+
   document.getElementById("jobSheetForm").reset();
   document.getElementById("jobDateFiling").value = new Date().toISOString().split("T")[0];
   document.getElementById("jobDateReceived").value = `${new Date().toISOString().split("T")[0]} 08:30 AM`;
@@ -595,6 +610,15 @@ async function openEditJobSheetModal(jobId) {
     const j = await res.json();
 
     document.getElementById("jobSheetModalTitle").textContent = `Update Job Sheet: Ref #${j.ref_no}`;
+    const submitBtn = document.getElementById("btnSubmitJobSheet");
+    if (submitBtn) submitBtn.textContent = "Save Changes";
+
+    // When editing, show all sections for complete administrative control
+    const sec2 = document.getElementById("jobSection2Wrapper");
+    if (sec2) sec2.style.display = "contents";
+    const sec3 = document.getElementById("jobSection3Wrapper");
+    if (sec3) sec3.style.display = "contents";
+
     const delBtn = document.getElementById("btnDeleteJobSheetModal");
     if (delBtn) delBtn.style.display = "inline-flex";
     document.getElementById("jobAssetSelect").value = j.asset_id;
@@ -695,9 +719,9 @@ function getNextStatusActionHtml(j) {
     case "Open":
       return `<button class="btn btn-cyan btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'In Progress', '${safeRef}')" title="Start working on ticket — advance to In Progress">▶️ In Progress</button>`;
     case "In Progress":
-      return `<button class="btn btn-accent btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'Resolved', '${safeRef}')" title="Mark repair as Resolved">✅ Resolve</button>`;
+      return `<button class="btn btn-accent btn-sm" onclick="openResolveJobModal(${j.id}, '${safeRef}')" title="Complete Assessment & Mark Resolved">✅ Resolve</button>`;
     case "Resolved":
-      return `<button class="btn btn-secondary btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'Closed', '${safeRef}')" title="Client signed off — close ticket">🔒 Close</button>`;
+      return `<button class="btn btn-secondary btn-sm" onclick="openCloseJobModal(${j.id}, '${safeRef}')" title="Record Client Evaluation & Close Ticket">🔒 Close</button>`;
     case "Closed":
       return `<button class="btn btn-secondary btn-sm" onclick="quickUpdateJobStatus(${j.id}, 'Open', '${safeRef}')" title="Reopen this job sheet" style="opacity: 0.75;">🔄 Reopen</button>`;
     default:
@@ -705,7 +729,148 @@ function getNextStatusActionHtml(j) {
   }
 }
 
-// Quick 1-Click Status Transition
+// Staged Modal: Section 2 - Technical Assessment & Resolve
+async function openResolveJobModal(jobId, refNo) {
+  resolvingJobId = jobId;
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/`);
+    const j = await res.json();
+
+    const titleRef = document.getElementById("resolveJobRefTitle");
+    if (titleRef) titleRef.textContent = `#${j.ref_no || refNo}`;
+
+    document.getElementById("resolveDiagnosis").value = j.assessment || "";
+    document.getElementById("resolveActions").value = j.actions_taken || "";
+    document.getElementById("resolveAppSoftware").value = j.app_software_description || "";
+    document.getElementById("resolveAppVersion").value = j.app_software_version || "";
+    document.getElementById("resolveConnectivity").value = j.connectivity_description || "";
+    document.getElementById("resolveUserAccount").value = j.user_account_description || "";
+
+    const now = new Date();
+    const pad = n => String(n).padStart(2, '0');
+    const nowStr = `${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())} ${pad(now.getHours())}:${pad(now.getMinutes())}`;
+
+    document.getElementById("resolveDateReceived").value = j.date_time_received || `${j.date_of_filing} 08:30 AM`;
+    document.getElementById("resolveDateCompleted").value = j.date_time_completed || nowStr;
+    document.getElementById("resolveFulfilledBy").value = j.fulfilled_by || "";
+    document.getElementById("resolveReviewedBy").value = j.reviewed_by || "";
+
+    document.getElementById("resolveJobModal")?.classList.add("active");
+  } catch (err) {
+    console.error("openResolveJobModal error:", err);
+    showToast("Error loading job sheet details", "error");
+  }
+}
+
+async function handleResolveFormSubmit(e) {
+  e.preventDefault();
+  if (!resolvingJobId) return;
+
+  const payload = {
+    status: "Resolved",
+    update_asset_status: "In Use",
+    assessment: document.getElementById("resolveDiagnosis").value.trim(),
+    actions_taken: document.getElementById("resolveActions").value.trim(),
+    app_software_description: document.getElementById("resolveAppSoftware").value.trim(),
+    app_software_version: document.getElementById("resolveAppVersion").value.trim(),
+    connectivity_description: document.getElementById("resolveConnectivity").value.trim(),
+    user_account_description: document.getElementById("resolveUserAccount").value.trim(),
+    date_time_received: document.getElementById("resolveDateReceived").value.trim(),
+    date_time_completed: document.getElementById("resolveDateCompleted").value.trim(),
+    fulfilled_by: document.getElementById("resolveFulfilledBy").value.trim(),
+    reviewed_by: document.getElementById("resolveReviewedBy").value.trim()
+  };
+
+  try {
+    const res = await fetch(`/api/jobs/${resolvingJobId}/`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      showToast(err.error || "Failed to resolve ticket", "error");
+      return;
+    }
+
+    showToast("Technical assessment saved & ticket marked Resolved!", "success");
+    closeAllModals();
+    await loadJobs();
+    await loadAssets();
+    await loadStats();
+    await loadRepairHistory();
+  } catch (err) {
+    console.error("handleResolveFormSubmit error:", err);
+    showToast("Network error saving assessment", "error");
+  } finally {
+    resolvingJobId = null;
+  }
+}
+
+// Staged Modal: Section 3 - Client Evaluation & Close
+async function openCloseJobModal(jobId, refNo) {
+  closingJobId = jobId;
+  try {
+    const res = await fetch(`/api/jobs/${jobId}/`);
+    const j = await res.json();
+
+    const titleRef = document.getElementById("closeJobRefTitle");
+    if (titleRef) titleRef.textContent = `#${j.ref_no || refNo}`;
+
+    document.getElementById("closeEvalAddressed").value = j.concern_addressed || "Yes";
+    document.getElementById("closeEvalSupport").value = j.it_support_satisfaction || "Very Satisfied";
+    document.getElementById("closeEvalSolution").value = j.solution_satisfaction || "Very Satisfied";
+    document.getElementById("closeComments").value = j.comments_suggestions || "";
+
+    document.getElementById("closeJobModal")?.classList.add("active");
+  } catch (err) {
+    console.error("openCloseJobModal error:", err);
+    showToast("Error loading job sheet details", "error");
+  }
+}
+
+async function handleCloseFormSubmit(e) {
+  e.preventDefault();
+  if (!closingJobId) return;
+
+  const payload = {
+    status: "Closed",
+    update_asset_status: "In Use",
+    concern_addressed: document.getElementById("closeEvalAddressed").value,
+    it_support_satisfaction: document.getElementById("closeEvalSupport").value,
+    solution_satisfaction: document.getElementById("closeEvalSolution").value,
+    comments_suggestions: document.getElementById("closeComments").value.trim()
+  };
+
+  try {
+    const res = await fetch(`/api/jobs/${closingJobId}/`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      showToast(err.error || "Failed to close ticket", "error");
+      return;
+    }
+
+    showToast("Client evaluation recorded & ticket closed!", "success");
+    closeAllModals();
+    await loadJobs();
+    await loadAssets();
+    await loadStats();
+    await loadRepairHistory();
+  } catch (err) {
+    console.error("handleCloseFormSubmit error:", err);
+    showToast("Network error closing ticket", "error");
+  } finally {
+    closingJobId = null;
+  }
+}
+
+// Quick 1-Click Status Transition (For In Progress and Reopen)
 async function quickUpdateJobStatus(jobId, newStatus, refNo) {
   try {
     const payload = { status: newStatus };
@@ -941,3 +1106,15 @@ function getStatusClass(status) {
     default: return "status-spare";
   }
 }
+
+// Expose handlers globally for HTML inline onclick handlers
+window.openResolveJobModal = openResolveJobModal;
+window.openCloseJobModal = openCloseJobModal;
+window.quickUpdateJobStatus = quickUpdateJobStatus;
+window.openNewJobSheetModal = openNewJobSheetModal;
+window.openEditJobSheetModal = openEditJobSheetModal;
+window.promptDeleteJobSheet = promptDeleteJobSheet;
+window.confirmDeleteJobSheet = confirmDeleteJobSheet;
+window.deleteCurrentEditingJobSheet = deleteCurrentEditingJobSheet;
+window.openPrintableJobSheet = openPrintableJobSheet;
+

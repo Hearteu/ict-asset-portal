@@ -20,9 +20,11 @@ if not exist "venv\Scripts\python.exe" (
 echo Opening web browser to http://127.0.0.1:8000 ...
 start http://127.0.0.1:8000
 
-:: Start Django server
-echo Starting Django Web Server on port 8000...
+:: Start Django server on all network interfaces
+echo Starting Django Web Server on 0.0.0.0:8000 (Local Network Accessible)...
+echo Local Access:   http://127.0.0.1:8000
+echo Network Access: http://192.168.0.120:8000
 echo (You can close this window anytime to stop the server)
 echo ========================================================
-venv\Scripts\python.exe manage.py runserver 127.0.0.1:8000
+venv\Scripts\python.exe manage.py runserver 0.0.0.0:8000
 pause
