@@ -580,6 +580,8 @@ function setupEventListeners() {
     filterDataGlobally(val);
   });
   document.getElementById("jobStatusFilter")?.addEventListener("change", loadJobs);
+  document.getElementById("confirmDeleteAssetBtn")?.addEventListener("click", confirmDeleteAsset);
+  document.getElementById("confirmDeleteJobBtn")?.addEventListener("click", confirmDeleteJobSheet);
 
   // History Filter
   const historySearch = document.getElementById("historySearchInput");
@@ -1414,14 +1416,28 @@ async function quickUpdateJobStatus(jobId, newStatus, refNo) {
   }
 }
 
-// Computer Asset Deletion Logic
-async function promptDeleteAsset(assetId, endUser, serialNumber) {
-  const label = endUser ? `${endUser} (${serialNumber})` : serialNumber;
-  const confirmed = confirm(`Are you sure you want to delete this computer from inventory?\n\n${label}\n\nThis will permanently remove this machine and its history. This action cannot be undone.`);
-  if (!confirmed) return;
+// Computer Asset Deletion (Custom Modal)
+let pendingDeleteAssetId = null;
+let pendingDeleteAssetSerial = null;
+
+function promptDeleteAsset(assetId, endUser, serialNumber) {
+  pendingDeleteAssetId = assetId;
+  pendingDeleteAssetSerial = serialNumber;
+  const userElem = document.getElementById("deleteAssetEndUser");
+  const serialElem = document.getElementById("deleteAssetSerial");
+  if (userElem) userElem.textContent = endUser || "Unassigned";
+  if (serialElem) serialElem.textContent = serialNumber || "N/A";
+  document.getElementById("deleteAssetModal")?.classList.add("active");
+}
+
+async function confirmDeleteAsset() {
+  if (!pendingDeleteAssetId) return;
+  const id = pendingDeleteAssetId;
+  const serial = pendingDeleteAssetSerial;
+  closeAllModals();
 
   try {
-    const res = await fetch(`/api/assets/${assetId}/`, {
+    const res = await fetch(`/api/assets/${id}/`, {
       method: "DELETE"
     });
 
@@ -1431,13 +1447,16 @@ async function promptDeleteAsset(assetId, endUser, serialNumber) {
       return;
     }
 
-    showToast(`Computer (${serialNumber}) removed from inventory`, "success");
+    showToast(`Computer (${serial || id}) removed from inventory`, "success");
     await loadAssets();
     await loadStats();
     await loadRepairHistory();
   } catch (err) {
-    console.error("promptDeleteAsset error:", err);
+    console.error("confirmDeleteAsset error:", err);
     showToast("Network error deleting computer", "error");
+  } finally {
+    pendingDeleteAssetId = null;
+    pendingDeleteAssetSerial = null;
   }
 }
 
@@ -1450,14 +1469,26 @@ function deleteCurrentEditingAsset() {
   promptDeleteAsset(id, owner, serial);
 }
 
-// Delete Job Sheet Logic
-async function promptDeleteJobSheet(jobId, refNo) {
-  const label = refNo ? `#${refNo}` : `Ticket ID ${jobId}`;
-  const confirmed = confirm(`Are you sure you want to delete Job Sheet ${label}?\n\nThis action cannot be undone.`);
-  if (!confirmed) return;
+// Delete Job Sheet (Custom Modal)
+let pendingDeleteJobId = null;
+let pendingDeleteJobRef = null;
+
+function promptDeleteJobSheet(jobId, refNo) {
+  pendingDeleteJobId = jobId;
+  pendingDeleteJobRef = refNo;
+  const refElem = document.getElementById("deleteJobRefNo");
+  if (refElem) refElem.textContent = refNo ? `#${refNo}` : `#${jobId}`;
+  document.getElementById("deleteJobModal")?.classList.add("active");
+}
+
+async function confirmDeleteJobSheet() {
+  if (!pendingDeleteJobId) return;
+  const id = pendingDeleteJobId;
+  const ref = pendingDeleteJobRef;
+  closeAllModals();
 
   try {
-    const res = await fetch(`/api/jobs/${jobId}/`, {
+    const res = await fetch(`/api/jobs/${id}/`, {
       method: "DELETE"
     });
 
@@ -1467,14 +1498,17 @@ async function promptDeleteJobSheet(jobId, refNo) {
       return;
     }
 
-    showToast(`Job Sheet ${label} deleted successfully`, "success");
+    showToast(`Job Sheet ${ref ? 'Ref #' + ref : ''} deleted successfully`, "success");
     await loadJobs();
     await loadAssets();
     await loadStats();
     await loadRepairHistory();
   } catch (err) {
-    console.error("promptDeleteJobSheet error:", err);
+    console.error("confirmDeleteJobSheet error:", err);
     showToast("Network error deleting job sheet", "error");
+  } finally {
+    pendingDeleteJobId = null;
+    pendingDeleteJobRef = null;
   }
 }
 
@@ -1650,6 +1684,8 @@ window.promptDeleteJobSheet = promptDeleteJobSheet;
 window.deleteCurrentEditingJobSheet = deleteCurrentEditingJobSheet;
 window.promptDeleteAsset = promptDeleteAsset;
 window.deleteCurrentEditingAsset = deleteCurrentEditingAsset;
+window.confirmDeleteAsset = confirmDeleteAsset;
+window.confirmDeleteJobSheet = confirmDeleteJobSheet;
 window.openPrintableJobSheet = openPrintableJobSheet;
 window.closeAllModals = closeAllModals;
 
