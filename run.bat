@@ -1,9 +1,9 @@
 @echo off
-title ICT Asset Inventory & Job Sheet Portal (Django)
+title ICT Asset Inventory and Job Sheet Portal (Django)
 cd /d "%~dp0"
 
 echo ========================================================
-echo  Starting ICT Asset Inventory & Job Sheet Portal...
+echo  Starting ICT Asset Inventory and Job Sheet Portal...
 echo ========================================================
 
 :: Check virtual environment

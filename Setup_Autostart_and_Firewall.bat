@@ -3,7 +3,7 @@ title DPWH ICT Portal - Persistent LAN Setup
 cd /d "%~dp0"
 
 echo ======================================================================
-echo   DPWH ICT Portal - Network Broadcast & Persistent Autostart Setup
+echo   DPWH ICT Portal - Network Broadcast and Persistent Autostart Setup
 echo ======================================================================
 echo.
 
