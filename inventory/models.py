@@ -5,9 +5,9 @@ class Asset(models.Model):
     DEVICE_TYPES = [
         ('Desktop', 'Desktop'),
         ('Laptop', 'Laptop'),
-        ('All-in-One', 'All-in-One'),
-        ('Server', 'Server'),
-        ('Workstation', 'Workstation'),
+        ('Printer', 'Printer'),
+        ('Switch', 'Switch'),
+        ('Router', 'Router'),
         ('Other', 'Other'),
     ]
 

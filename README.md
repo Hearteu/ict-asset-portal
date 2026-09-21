@@ -17,7 +17,7 @@ A modern, local-first internal web portal designed specifically for ICT staff to
 - Recent repair activity feed.
 
 ### 2. 💻 Computer & Hardware Inventory Management
-- Full lifecycle tracking: **Asset Tag**, **Serial Number**, **Device Type** (Laptop, Desktop, Workstation, Server, All-in-One), **Brand & Model**.
+- Full lifecycle tracking: **Asset Tag**, **Serial Number**, **Device Type** (Desktop, Laptop, Printer, Switch, Router), **Brand & Model**.
 - Technical Specifications & Component Details:
   - Processor (CPU)
   - Memory (RAM)
