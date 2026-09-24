@@ -597,14 +597,8 @@ function setupEventListeners() {
     });
   });
 
-  // Close modal when clicking overlay background
-  document.querySelectorAll(".modal-overlay").forEach(overlay => {
-    overlay.addEventListener("click", (e) => {
-      if (e.target === overlay) {
-        closeAllModals();
-      }
-    });
-  });
+  // Note: Modals can only be closed via close buttons (X/Close) or Escape key, not by clicking outside/overlay
+
 
   // Close modals on Escape key
   document.addEventListener("keydown", (e) => {
@@ -745,7 +739,7 @@ function renderAssetsTable(assets) {
         <span style="font-size: 0.78rem; color: var(--text-secondary);">${a.ups_serial || '-'}</span>
       </td>
       <td>
-        <span class="badge-pill office-badge" title="${off.full}" data-tooltip="${off.full}">${off.short}</span>
+        <span class="badge-pill office-badge" data-tooltip="${off.full}">${off.short}</span>
       </td>
       <td style="text-align: center; white-space: nowrap;">
         <div class="action-btns-group">
@@ -844,7 +838,7 @@ function renderJobsTable(jobs) {
         <div style="font-size: 0.72rem; color: var(--text-muted);">${j.contact_no ? 'Tel: ' + j.contact_no : ''}</div>
       </td>
       <td>
-        <span class="badge-pill office-badge" title="${off.full}" data-tooltip="${off.full}">${off.short}</span>
+        <span class="badge-pill office-badge" data-tooltip="${off.full}">${off.short}</span>
       </td>
       <td>
         <div><strong style="color: #0f172a;">${j.hardware_brand_model || 'N/A'}</strong></div>
@@ -948,7 +942,7 @@ async function viewAssetDetails(assetId) {
     document.getElementById("detailMonitor").textContent = asset.monitor_serial || "-";
     document.getElementById("detailUps").textContent = asset.ups_serial || "-";
     const off = getOfficeInfo(asset.office);
-    document.getElementById("detailDept").innerHTML = `<span class="badge-pill office-badge" title="${off.full}" data-tooltip="${off.full}">${off.short}</span> <span style="font-size: 0.85rem; color: var(--text-secondary); margin-left: 6px;">(${off.full})</span>`;
+    document.getElementById("detailDept").innerHTML = `<span class="badge-pill office-badge" style="cursor: default; pointer-events: none; margin: 0;">${off.short}</span> <span style="font-size: 0.85rem; color: var(--text-secondary); font-weight: 500;">(${off.full})</span>`;
     document.getElementById("detailType").textContent = asset.device;
     document.getElementById("detailStatus").innerHTML = `<span class="status-badge ${getStatusClass(asset.status)}">${asset.status}</span>`;
 
